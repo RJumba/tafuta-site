@@ -134,3 +134,29 @@ body {
     transform: translateY(0);
   }
 }
+
+.dashboard {
+  padding: 20px;
+  font-family: Arial;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.profile-pic {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+}
+
+.logoutbtn {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background: red;
+  color: white;
+  border: none;
+  cursor: pointer;
+}

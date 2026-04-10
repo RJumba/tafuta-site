@@ -1,13 +1,16 @@
 import { useState } from 'react'
+import { Navigate, useNavigate } from 'react-router-dom'
 
 function Login() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const Navigate = useNavigate()
 
   const handleSubmit = (e) => {
     e.preventDefault()
     alert (`Welcome, ${name || "User"}!`)
+    Navigate('/dashboard')
   }
 
   return (
@@ -52,7 +55,7 @@ function Login() {
         />
         </div>
 
-        <button className='loginBtn'>Login</button>
+        <button className='loginBtn' type='submit'>Login</button>
 
         <div className='login-footer'>
             <p>Don't have an account? <a href="/signup">Sign up</a></p>
