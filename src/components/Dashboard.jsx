@@ -1,15 +1,19 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { Home, Menu, User, LogOut } from 'lucide-react'
 
 function Dashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
+  const navigate = useNavigate()
 
   const user = {
-    name: 'Ian',
-    email: 'ian@example.com',
+    name: 'Jumba Ray',
+    email: 'jumba@example.com',
     profilePic: 'https://via.placeholder.com/60',
   }
 
   const handleLogout = () => {
+    navigate('/')
     alert('Logged out successfully!')
   }
 
@@ -28,7 +32,7 @@ function Dashboard() {
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
               className="shrink-0 w-10 h-10 flex items-center justify-center rounded-lg bg-slate-700 hover:bg-slate-600 text-white border border-slate-500"
             >
-              {isSidebarOpen ? '←' : '→'}
+              <Menu size={20}/>
             </button>
           </div>
 
@@ -48,12 +52,12 @@ function Dashboard() {
 
           <nav className="mt-6 space-y-3">
             <button className="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-slate-800 transition">
-              <span>🏠</span>
+              <Home size={20} />
               {isSidebarOpen && <span>Dashboard</span>}
             </button>
 
             <button className="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-slate-800 transition">
-              <span>👤</span>
+              <User size={20} />
               {isSidebarOpen && <span>Profile</span>}
             </button>
           </nav>
@@ -63,7 +67,7 @@ function Dashboard() {
           onClick={handleLogout}
           className="w-full flex items-center gap-3 px-3 py-3 rounded-xl bg-red-500 hover:bg-red-600 transition"
         >
-          <span>🚪</span>
+          <LogOut size={20} />
           {isSidebarOpen && <span>Logout</span>}
         </button>
       </aside>
