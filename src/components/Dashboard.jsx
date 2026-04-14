@@ -1,41 +1,47 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { LayoutDashboard, History, Menu, User, Settings, LogOut, Sliders } from 'lucide-react'
-
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  LayoutDashboard,
+  History,
+  Menu,
+  User,
+  Settings,
+  LogOut,
+  Sliders,
+} from "lucide-react";
 
 function Dashboard() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
-  const navigate = useNavigate()
-  const [activeSection, setActiveSection] = useState('dashboard')
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const navigate = useNavigate();
+  const [activeSection, setActiveSection] = useState("dashboard");
 
   const user = {
-    name: 'Jumba Ray',
-    email: 'jumba@example.com',
-    profilePic: 'https://via.placeholder.com/60',
-  }
+    name: "Jumba Ray",
+    email: "jumba@example.com",
+    profilePic: "https://via.placeholder.com/60",
+  };
 
   const handleLogout = () => {
-    navigate('/')
-    alert('Logged out successfully!')
-  }
+    navigate("/");
+    alert("Logged out successfully!");
+  };
 
   return (
     <div className="flex min-h-screen bg-slate-100">
       <aside
         className={`bg-slate-900 text-white flex flex-col justify-between p-4 shadow-xl transition-all duration-300 ${
-          isSidebarOpen ? 'w-72' : 'w-20'
+          isSidebarOpen ? "w-72" : "w-20"
         }`}
       >
         <div>
           <div className="flex items-center justify-between mb-6">
             {isSidebarOpen && <h2 className="text-lg font-bold">Tafuta</h2>}
             <button
-            
-            type='button'
+              type="button"
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
               className="shrink-0 w-10 h-10 flex items-center justify-center rounded-lg bg-slate-700 hover:bg-slate-600 text-white border border-slate-500"
             >
-              <Menu size={20}/>
+              <Menu size={20} />
             </button>
           </div>
 
@@ -48,18 +54,20 @@ function Dashboard() {
             {isSidebarOpen && (
               <>
                 <h2 className="mt-3 text-base font-bold">{user.name}</h2>
-                <p className="text-sm text-slate-300 text-center">{user.email}</p>
+                <p className="text-sm text-slate-300 text-center">
+                  {user.email}
+                </p>
               </>
             )}
           </div>
 
           <nav className="mt-6 space-y-3">
             <button
-            onClick={() => setActiveSection('dashboard')}
+              onClick={() => setActiveSection("dashboard")}
               className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl  ${
-                activeSection === 'dashboard' 
-                ? 'bg-slate-700' 
-                : 'hover:bg-slate-800 transition'
+                activeSection === "dashboard"
+                  ? "bg-slate-700"
+                  : "hover:bg-slate-800 transition"
               }`}
             >
               <LayoutDashboard size={20} />
@@ -68,11 +76,11 @@ function Dashboard() {
 
             <button
               onClick={() => setActiveSection("profile")}
-            className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl transition ${
-              activeSection === "profile"
-                ? "bg-sky-500 text-white"
-                : "hover:bg-slate-800"
-            }`}
+              className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl transition ${
+                activeSection === "profile"
+                  ? "bg-sky-500 text-white"
+                  : "hover:bg-slate-800"
+              }`}
             >
               <User size={20} />
               {isSidebarOpen && <span>Profile</span>}
@@ -91,28 +99,28 @@ function Dashboard() {
             </button>
 
             <button
-               onClick={() => setActiveSection("settings")}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition ${
-              activeSection === "settings"
-                ? "bg-sky-500 text-white"
-                : "hover:bg-slate-800"
-            }`}
+              onClick={() => setActiveSection("settings")}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition ${
+                activeSection === "settings"
+                  ? "bg-sky-500 text-white"
+                  : "hover:bg-slate-800"
+              }`}
             >
               <Settings size={20} />
               {isSidebarOpen && <span>Settings</span>}
             </button>
 
             <button
-            onClick={() => setActiveSection("history")}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition ${
-              activeSection === "history"
-                ? "bg-sky-500 text-white"
-                : "hover:bg-slate-800"
-            }`}
-          >
-            <History size={20} />
-            {isSidebarOpen && <span>Search History</span>}
-          </button>
+              onClick={() => setActiveSection("history")}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition ${
+                activeSection === "history"
+                  ? "bg-sky-500 text-white"
+                  : "hover:bg-slate-800"
+              }`}
+            >
+              <History size={20} />
+              {isSidebarOpen && <span>Search History</span>}
+            </button>
           </nav>
         </div>
 
@@ -124,78 +132,360 @@ function Dashboard() {
           {isSidebarOpen && <span>Logout</span>}
         </button>
       </aside>
-      
-      <div>
 
-      <main className="flex-1 p-8">
-        {activeSection === "dashboard" && (
-          <div>
-            <h1 className="text-3xl font-bold text-slate-800 mb-4">Dashboard</h1>
-            <p className="text-slate-600">
-              Welcome to your dashboard. This is the main overview page.
-            </p>
-          </div>
-        )}
+      <div className="flex-1 flex flex-col">
+        <div className="bg-white shadow-sm px-6 py-4 flex items-center justify-between">
+          <h1 className="text-3xl font-bold text-slate-800 mb-4">Tafuta</h1>
+          <input
+            className="bg-slate-900 text-slate-300 placeholder:text-slate-500 border border-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-xl p-3 focus:border-blue-500 w-80 transition"
+            type="text"
+            placeholder="Search houses, locations,etc..."
+          />
+        </div>
 
-        {activeSection === "profile" && (
-          <div className="bg-white rounded-2xl shadow-md p-6 max-w-2xl">
-            <h1 className="text-3xl font-bold text-slate-800 mb-6">My Profile</h1>
-
-            <div className="flex items-center gap-6 mb-6">
-              <img
-                src={user.profilePic}
-                alt="Profile"
-                className="w-24 h-24 rounded-full object-cover border-4 border-sky-500"
-              />
+        <main className="flex-1 p-8">
+          {activeSection === "dashboard" && (
+            <div className="space-y-8">
               <div>
-                <h2 className="text-2xl font-semibold text-slate-800">{user.name}</h2>
-                <p className="text-slate-600">{user.role || 'Not specified'}</p>
+                <h1 className="text-3xl font-bold text-slate-800 mb-2">
+                  Dashboard
+                </h1>
+                <p className="text-slate-600">
+                  Welcome back, {user.name}. Here is a quick overview of your
+                  housing activity.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-white rounded-2xl shadow-md p-6 border border-slate-200">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-xl font-semibold text-slate-800">
+                      Saved Homes
+                    </h2>
+                    <span className="text-sm bg-sky-100 text-sky-700 px-3 py-1 rounded-full">
+                      12 Homes
+                    </span>
+                  </div>
+                  <p className="text-slate-600 mb-6">
+                    Homes you have saved for later comparison and review.
+                  </p>
+
+                  <div className="space-y-3">
+                    <div className="bg-slate-50 rounded-xl p-4">
+                      <p className="font-medium text-slate-800">
+                        2 Bedroom Apartment - Kilimani
+                      </p>
+                      <p className="text-sm text-slate-500">KES 45,000/month</p>
+                    </div>
+                    <div className="bg-slate-50 rounded-xl p-4">
+                      <p className="font-medium text-slate-800">
+                        Studio Apartment - Westlands
+                      </p>
+                      <p className="text-sm text-slate-500">KES 30,000/month</p>
+                    </div>
+                  </div>
+
+                  <button className="mt-6 px-4 py-2 rounded-xl bg-sky-500 text-white hover:bg-sky-600 transition">
+                    View Saved Homes
+                  </button>
+                </div>
+
+                <div className="bg-white rounded-2xl shadow-md p-6 border border-slate-200">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-xl font-semibold text-slate-800">
+                      Recently Viewed
+                    </h2>
+                    <span className="text-sm bg-amber-100 text-amber-700 px-3 py-1 rounded-full">
+                      8 Viewed
+                    </span>
+                  </div>
+                  <p className="text-slate-600 mb-6">
+                    Listings you recently checked and may want to revisit.
+                  </p>
+
+                  <div className="space-y-3">
+                    <div className="bg-slate-50 rounded-xl p-4">
+                      <p className="font-medium text-slate-800">
+                        1 Bedroom House - Syokimau
+                      </p>
+                      <p className="text-sm text-slate-500">KES 25,000/month</p>
+                    </div>
+                    <div className="bg-slate-50 rounded-xl p-4">
+                      <p className="font-medium text-slate-800">
+                        Bedsitter - South B
+                      </p>
+                      <p className="text-sm text-slate-500">KES 18,000/month</p>
+                    </div>
+                  </div>
+
+                  <button className="mt-6 px-4 py-2 rounded-xl bg-slate-800 text-white hover:bg-slate-900 transition">
+                    Open Recent Views
+                  </button>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+                <div className="bg-white rounded-2xl shadow-md p-5 border border-slate-200">
+                  <h3 className="text-lg font-semibold text-slate-800 mb-3">
+                    Popular Locations
+                  </h3>
+                  <ul className="space-y-2 text-slate-600">
+                    <li>Kilimani</li>
+                    <li>Westlands</li>
+                    <li>Syokimau</li>
+                  </ul>
+                </div>
+
+                <div className="bg-white rounded-2xl shadow-md p-5 border border-slate-200">
+                  <h3 className="text-lg font-semibold text-slate-800 mb-3">
+                    Budget Overview
+                  </h3>
+                  <p className="text-slate-600">Min: KES 20,000</p>
+                  <p className="text-slate-600">Max: KES 60,000</p>
+                  <p className="text-slate-600">Target: 1–2 Bedroom</p>
+                </div>
+
+                <div className="bg-white rounded-2xl shadow-md p-5 border border-slate-200">
+                  <h3 className="text-lg font-semibold text-slate-800 mb-3">
+                    Search Activity
+                  </h3>
+                  <p className="text-3xl font-bold text-sky-600">24</p>
+                  <p className="text-slate-600 mt-2">Searches made this week</p>
+                </div>
+
+                <div className="bg-white rounded-2xl shadow-md p-5 border border-slate-200">
+                  <h3 className="text-lg font-semibold text-slate-800 mb-3">
+                    New Matches
+                  </h3>
+                  <p className="text-3xl font-bold text-emerald-600">6</p>
+                  <p className="text-slate-600 mt-2">
+                    New homes matching your preferences
+                  </p>
+                </div>
               </div>
             </div>
+          )}
 
-            <div className="space-y-4 text-slate-700">
+          {activeSection === "profile" && (
+            <div className="space-y-6">
               <div>
-                <p className="font-semibold">Email</p>
-                <p>{user.email}</p>
+                <h1 className="text-3xl font-bold text-slate-800 mb-2">
+                  My Profile
+                </h1>
+                <p className="text-slate-600">
+                  View your personal and location details here.
+                </p>
               </div>
 
-              <div>
-                <p className="font-semibold">Phone</p>
-                <p>{user.phone || 'Not specified'}</p>
-              </div>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="bg-white rounded-2xl shadow-md p-6">
+                  <div className="flex items-center gap-6 mb-6">
+                    <img
+                      src={user.profilePic}
+                      alt="Profile"
+                      className="w-24 h-24 rounded-full object-cover border-4 border-sky-500"
+                    />
+                    <div>
+                      <h2 className="text-2xl font-semibold text-slate-800">
+                        {user.name}
+                      </h2>
+                      <p className="text-slate-600">
+                        {user.role || "Not specified"}
+                      </p>
+                    </div>
+                  </div>
 
-              <div>
-                <p className="font-semibold">Role</p>
-                <p>{user.role || 'Not specified'}</p>
+                  <div className="space-y-4 text-slate-700">
+                    <div>
+                      <p className="font-semibold">Email</p>
+                      <p>{user.email}</p>
+                    </div>
+
+                    <div>
+                      <p className="font-semibold">Phone</p>
+                      <p>{user.phone || "Not specified"}</p>
+                    </div>
+
+                    <div>
+                      <p className="font-semibold">Role</p>
+                      <p>{user.role || "Not specified"}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-2xl shadow-md p-6">
+                  <h2 className="text-2xl font-semibold text-slate-800 mb-6">
+                    Location Details
+                  </h2>
+
+                  <div className="space-y-4 text-slate-700">
+                    <div>
+                      <p className="font-semibold">City</p>
+                      <p>{user.city || "Not specified"}</p>
+                    </div>
+
+                    <div>
+                      <p className="font-semibold">Constituency</p>
+                      <p>{user.constituency || "Not specified"}</p>
+                    </div>
+
+                    <div>
+                      <p className="font-semibold">Area</p>
+                      <p>{user.area || "Not specified"}</p>
+                    </div>
+
+                    <div>
+                      <p className="font-semibold">Full Location</p>
+                      <p>
+                        {user.city && user.constituency && user.area
+                          ? `${user.city}, ${user.constituency}, ${user.area}`
+                          : "Not specified"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {activeSection === "settings" && (
-          <div>
-            <h1 className="text-3xl font-bold text-slate-800 mb-4">Settings</h1>
-            <p className="text-slate-600">Your settings page will appear here.</p>
-          </div>
-        )}
+          {activeSection === "settings" && (
+            <div>
+              <h1 className="text-3xl font-bold text-slate-800 mb-4">
+                Settings
+              </h1>
+              <p className="text-slate-600">
+                Your settings page will appear here.
+              </p>
+            </div>
+          )}
 
-        {activeSection === "history" && (
-          <div>
-            <h1 className="text-3xl font-bold text-slate-800 mb-4">Search History</h1>
-            <p className="text-slate-600">Your search history will appear here.</p>
-          </div>
-        )}
+          {activeSection === "history" && (
+            <div>
+              <h1 className="text-3xl font-bold text-slate-800 mb-4">
+                Search History
+              </h1>
+              <p className="text-slate-600">
+                Your search history will appear here.
+              </p>
+            </div>
+          )}
 
-        {activeSection === "preferences" && (
-          <div>
-            <h1 className="text-3xl font-bold text-slate-800 mb-4">Preferences</h1>
-            <p className="text-slate-600">Your preferences page will appear here.</p>
-          </div>
-        )}
-      </main>
+          {activeSection === "preferences" && (
+            <div className="space-y-8">
+              <div>
+                <h1 className="text-3xl font-bold text-slate-800 mb-2">
+                  Preferences
+                </h1>
+                <p className="text-slate-600">
+                  Set your housing preferences so Tafuta can show you listings
+                  that match your needs.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="bg-white rounded-2xl shadow-md p-6 border border-slate-200">
+                  <h2 className="text-xl font-semibold text-slate-800 mb-2">
+                    Budget Preference
+                  </h2>
+                  <p className="text-slate-600 mb-6">
+                    Set the minimum and maximum rent you are comfortable with.
+                  </p>
+
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">
+                        Minimum Rent
+                      </label>
+                      <input
+                        type="number"
+                        placeholder="e.g. 15000"
+                        className="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none focus:ring-2 focus:ring-sky-400"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">
+                        Maximum Rent
+                      </label>
+                      <input
+                        type="number"
+                        placeholder="e.g. 50000"
+                        className="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none focus:ring-2 focus:ring-sky-400"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-2xl shadow-md p-6 border border-slate-200">
+                  <h2 className="text-xl font-semibold text-slate-800 mb-2">
+                    Preferred Locations
+                  </h2>
+                  <p className="text-slate-600 mb-6">
+                    Add up to three locations where you would like to find a
+                    home.
+                  </p>
+
+                  <div className="space-y-4">
+                    <input
+                      type="text"
+                      placeholder="First choice location"
+                      className="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none focus:ring-2 focus:ring-sky-400"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Second choice location"
+                      className="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none focus:ring-2 focus:ring-sky-400"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Third choice location"
+                      className="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none focus:ring-2 focus:ring-sky-400"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-2xl shadow-md p-6 border border-slate-200">
+                <h2 className="text-xl font-semibold text-slate-800 mb-2">
+                  Housing Type
+                </h2>
+                <p className="text-slate-600 mb-6">
+                  Select the type of housing you are interested in.
+                </p>
+
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  <button className="px-4 py-3 rounded-xl border border-slate-300 hover:bg-sky-50 hover:border-sky-400 transition text-slate-700">
+                    Bedsitter
+                  </button>
+                  <button className="px-4 py-3 rounded-xl border border-slate-300 hover:bg-sky-50 hover:border-sky-400 transition text-slate-700">
+                    Studio Apartment
+                  </button>
+                  <button className="px-4 py-3 rounded-xl border border-slate-300 hover:bg-sky-50 hover:border-sky-400 transition text-slate-700">
+                    One Bedroom
+                  </button>
+                  <button className="px-4 py-3 rounded-xl border border-slate-300 hover:bg-sky-50 hover:border-sky-400 transition text-slate-700">
+                    Two Bedroom
+                  </button>
+                  <button className="px-4 py-3 rounded-xl border border-slate-300 hover:bg-sky-50 hover:border-sky-400 transition text-slate-700">
+                    Three Bedroom
+                  </button>
+                  <button className="px-4 py-3 rounded-xl border border-slate-300 hover:bg-sky-50 hover:border-sky-400 transition text-slate-700">
+                    Single Room
+                  </button>
+                  <button className="px-4 py-3 rounded-xl border border-slate-300 hover:bg-sky-50 hover:border-sky-400 transition text-slate-700">
+                    Maisonette
+                  </button>
+                  <button className="px-4 py-3 rounded-xl border border-slate-300 hover:bg-sky-50 hover:border-sky-400 transition text-slate-700">
+                    Bungalow
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </main>
       </div>
     </div>
-  )
+  );
 }
 
-export default Dashboard
+export default Dashboard;
