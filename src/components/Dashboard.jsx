@@ -349,24 +349,349 @@ function Dashboard() {
           )}
 
           {activeSection === "settings" && (
-            <div>
-              <h1 className="text-3xl font-bold text-slate-800 mb-4">
-                Settings
-              </h1>
-              <p className="text-slate-600">
-                Your settings page will appear here.
-              </p>
+            <div className="space-y-8">
+              <div>
+                <h1 className="text-3xl font-bold text-slate-800 mb-2">
+                  Settings
+                </h1>
+                <p className="text-slate-600">
+                  Manage your account preferences, privacy, notifications, and
+                  display options.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="bg-white rounded-2xl shadow-md p-6 border border-slate-200">
+                  <h2 className="text-xl font-semibold text-slate-800 mb-2">
+                    Account Settings
+                  </h2>
+                  <p className="text-slate-600 mb-6">
+                    Update your basic account information.
+                  </p>
+
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">
+                        Full Name
+                      </label>
+                      <input
+                        type="text"
+                        defaultValue={user.name}
+                        className="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none focus:ring-2 focus:ring-sky-400"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">
+                        Email Address
+                      </label>
+                      <input
+                        type="email"
+                        defaultValue={user.email}
+                        className="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none focus:ring-2 focus:ring-sky-400"
+                      />
+                    </div>
+
+                    <button className="px-5 py-3 rounded-xl bg-sky-500 text-white hover:bg-sky-600 transition">
+                      Save Account Changes
+                    </button>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-2xl shadow-md p-6 border border-slate-200">
+                  <h2 className="text-xl font-semibold text-slate-800 mb-2">
+                    Notification Settings
+                  </h2>
+                  <p className="text-slate-600 mb-6">
+                    Choose what updates Tafuta should notify you about.
+                  </p>
+
+                  <div className="space-y-4">
+                    <label className="flex items-center justify-between gap-4 p-4 rounded-xl bg-slate-50">
+                      <div>
+                        <p className="font-medium text-slate-800">
+                          New listings
+                        </p>
+                        <p className="text-sm text-slate-500">
+                          Get notified when new homes match your preferences.
+                        </p>
+                      </div>
+                      <input
+                        type="checkbox"
+                        defaultChecked
+                        className="w-5 h-5"
+                      />
+                    </label>
+
+                    <label className="flex items-center justify-between gap-4 p-4 rounded-xl bg-slate-50">
+                      <div>
+                        <p className="font-medium text-slate-800">
+                          Price drops
+                        </p>
+                        <p className="text-sm text-slate-500">
+                          Get alerts when saved homes reduce in price.
+                        </p>
+                      </div>
+                      <input
+                        type="checkbox"
+                        defaultChecked
+                        className="w-5 h-5"
+                      />
+                    </label>
+
+                    <label className="flex items-center justify-between gap-4 p-4 rounded-xl bg-slate-50">
+                      <div>
+                        <p className="font-medium text-slate-800">
+                          Viewing reminders
+                        </p>
+                        <p className="text-sm text-slate-500">
+                          Remind me about upcoming house viewings.
+                        </p>
+                      </div>
+                      <input type="checkbox" className="w-5 h-5" />
+                    </label>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-2xl shadow-md p-6 border border-slate-200">
+                  <h2 className="text-xl font-semibold text-slate-800 mb-2">
+                    Privacy Settings
+                  </h2>
+                  <p className="text-slate-600 mb-6">
+                    Control how visible your information is.
+                  </p>
+
+                  <div className="space-y-4">
+                    <label className="flex items-center justify-between gap-4 p-4 rounded-xl bg-slate-50">
+                      <div>
+                        <p className="font-medium text-slate-800">
+                          Show my profile photo
+                        </p>
+                        <p className="text-sm text-slate-500">
+                          Allow your profile photo to appear on your account.
+                        </p>
+                      </div>
+                      <input
+                        type="checkbox"
+                        defaultChecked
+                        className="w-5 h-5"
+                      />
+                    </label>
+
+                    <label className="flex items-center justify-between gap-4 p-4 rounded-xl bg-slate-50">
+                      <div>
+                        <p className="font-medium text-slate-800">
+                          Save search history
+                        </p>
+                        <p className="text-sm text-slate-500">
+                          Let Tafuta remember your recently viewed homes and
+                          searches.
+                        </p>
+                      </div>
+                      <input
+                        type="checkbox"
+                        defaultChecked
+                        className="w-5 h-5"
+                      />
+                    </label>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-2xl shadow-md p-6 border border-slate-200">
+                  <h2 className="text-xl font-semibold text-slate-800 mb-2">
+                    Display Settings
+                  </h2>
+                  <p className="text-slate-600 mb-6">
+                    Adjust how your dashboard looks.
+                  </p>
+
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">
+                        Theme
+                      </label>
+                      <select className="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none focus:ring-2 focus:ring-sky-400">
+                        <option>Light Mode</option>
+                        <option>Dark Mode</option>
+                        <option>System Default</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">
+                        Default Landing Section
+                      </label>
+                      <select className="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none focus:ring-2 focus:ring-sky-400">
+                        <option>Dashboard</option>
+                        <option>Saved Homes</option>
+                        <option>Recently Viewed</option>
+                        <option>Preferences</option>
+                      </select>
+                    </div>
+
+                    <button className="px-5 py-3 rounded-xl bg-slate-800 text-white hover:bg-slate-900 transition">
+                      Save Display Settings
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 
           {activeSection === "history" && (
-            <div>
-              <h1 className="text-3xl font-bold text-slate-800 mb-4">
-                Search History
-              </h1>
-              <p className="text-slate-600">
-                Your search history will appear here.
-              </p>
+            <div className="space-y-8">
+              <div>
+                <h1 className="text-3xl font-bold text-slate-800 mb-2">
+                  Search History
+                </h1>
+                <p className="text-slate-600">
+                  View the houses, locations, and filters you have searched
+                  recently.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="bg-white rounded-2xl shadow-md p-5 border border-slate-200">
+                  <h3 className="text-lg font-semibold text-slate-800">
+                    Total Searches
+                  </h3>
+                  <p className="text-3xl font-bold text-sky-600 mt-3">24</p>
+                  <p className="text-sm text-slate-500 mt-1">
+                    Searches this week
+                  </p>
+                </div>
+
+                <div className="bg-white rounded-2xl shadow-md p-5 border border-slate-200">
+                  <h3 className="text-lg font-semibold text-slate-800">
+                    Most Searched Area
+                  </h3>
+                  <p className="text-3xl font-bold text-emerald-600 mt-3">
+                    Kilimani
+                  </p>
+                  <p className="text-sm text-slate-500 mt-1">
+                    Based on recent activity
+                  </p>
+                </div>
+
+                <div className="bg-white rounded-2xl shadow-md p-5 border border-slate-200">
+                  <h3 className="text-lg font-semibold text-slate-800">
+                    Last Search
+                  </h3>
+                  <p className="text-xl font-bold text-slate-800 mt-3">
+                    2 Bedroom
+                  </p>
+                  <p className="text-sm text-slate-500 mt-1">
+                    Westlands • KES 45,000
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden">
+                <div className="p-6 border-b border-slate-200">
+                  <h2 className="text-xl font-semibold text-slate-800">
+                    Recent Searches
+                  </h2>
+                  <p className="text-slate-600 mt-1">
+                    Your latest house-search activity.
+                  </p>
+                </div>
+
+                <div className="divide-y divide-slate-200">
+                  <div className="p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div>
+                      <h3 className="font-semibold text-slate-800">
+                        2 Bedroom Apartment
+                      </h3>
+                      <p className="text-sm text-slate-500">
+                        Location: Kilimani • Budget: KES 35,000 - KES 55,000
+                      </p>
+                    </div>
+                    <button className="px-4 py-2 rounded-xl bg-sky-500 text-white hover:bg-sky-600 transition">
+                      Search Again
+                    </button>
+                  </div>
+
+                  <div className="p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div>
+                      <h3 className="font-semibold text-slate-800">
+                        Studio Apartment
+                      </h3>
+                      <p className="text-sm text-slate-500">
+                        Location: Westlands • Budget: KES 25,000 - KES 40,000
+                      </p>
+                    </div>
+                    <button className="px-4 py-2 rounded-xl bg-sky-500 text-white hover:bg-sky-600 transition">
+                      Search Again
+                    </button>
+                  </div>
+
+                  <div className="p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div>
+                      <h3 className="font-semibold text-slate-800">
+                        Bedsitter
+                      </h3>
+                      <p className="text-sm text-slate-500">
+                        Location: South B • Budget: KES 12,000 - KES 22,000
+                      </p>
+                    </div>
+                    <button className="px-4 py-2 rounded-xl bg-sky-500 text-white hover:bg-sky-600 transition">
+                      Search Again
+                    </button>
+                  </div>
+
+                  <div className="p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div>
+                      <h3 className="font-semibold text-slate-800">
+                        One Bedroom House
+                      </h3>
+                      <p className="text-sm text-slate-500">
+                        Location: Syokimau • Budget: KES 20,000 - KES 35,000
+                      </p>
+                    </div>
+                    <button className="px-4 py-2 rounded-xl bg-sky-500 text-white hover:bg-sky-600 transition">
+                      Search Again
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-2xl shadow-md p-6 border border-slate-200">
+                <h2 className="text-xl font-semibold text-slate-800 mb-4">
+                  Top Locations Searched
+                </h2>
+
+                <div className="space-y-4">
+                  <div>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span className="text-slate-700">Kilimani</span>
+                      <span className="text-slate-500">9 searches</span>
+                    </div>
+                    <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
+                      <div className="h-full w-3/4 bg-sky-500 rounded-full"></div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span className="text-slate-700">Westlands</span>
+                      <span className="text-slate-500">7 searches</span>
+                    </div>
+                    <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
+                      <div className="h-full w-2/3 bg-emerald-500 rounded-full"></div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span className="text-slate-700">Syokimau</span>
+                      <span className="text-slate-500">5 searches</span>
+                    </div>
+                    <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
+                      <div className="h-full w-1/2 bg-amber-500 rounded-full"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 
