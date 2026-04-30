@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "../lib/supabase";
 import {
   LayoutDashboard,
   History,
@@ -15,13 +16,31 @@ function Dashboard() {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState("dashboard");
 
-  const user = {
-    name: "Jumba Ray",
-    email: "jumba@example.com",
-    profilePic: "https://via.placeholder.com/60",
-  };
+  const [user, setUser] = useState(null);
 
-  const handleLogout = () => {
+  useEffect(() => {
+    const getUser = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        navigate("/");
+        return;
+      }
+
+      setUser({
+        name: user.user_metadata?.name || "User",
+        email: user.email,
+        profilePic: "https://via.placeholder.com/60",
+      });
+    };
+
+    getUser();
+  }, [navigate]);
+
+  const handleLogout = async() => {
+    await supabase.auth.signOut();
     navigate("/");
     alert("Logged out successfully!");
   };
@@ -47,15 +66,15 @@ function Dashboard() {
 
           <div className="flex flex-col items-center border-b border-slate-700 pb-6">
             <img
-              src={user.profilePic}
+              src={user?.profilePic}
               alt="Profile"
               className="w-14 h-14 rounded-full object-cover border-2 border-blue-500"
             />
             {isSidebarOpen && (
               <>
-                <h2 className="mt-3 text-base font-bold">{user.name}</h2>
+                <h2 className="mt-3 text-base font-bold">{user?.name}</h2>
                 <p className="text-sm text-slate-300 text-center">
-                  {user.email}
+                  {user?.email}
                 </p>
               </>
             )}
@@ -151,7 +170,7 @@ function Dashboard() {
                   Dashboard
                 </h1>
                 <p className="text-slate-600">
-                  Welcome back, {user.name}. Here is a quick overview of your
+                  Welcome back, {user?.name}. Here is a quick overview of your
                   housing activity.
                 </p>
               </div>
@@ -281,7 +300,7 @@ function Dashboard() {
                 <div className="bg-white rounded-2xl shadow-md p-6">
                   <div className="flex items-center gap-6 mb-6">
                     <img
-                      src={user.profilePic}
+                      src={user?.profilePic}
                       alt="Profile"
                       className="w-24 h-24 rounded-full object-cover border-4 border-sky-500"
                     />
@@ -290,7 +309,7 @@ function Dashboard() {
                         {user.name}
                       </h2>
                       <p className="text-slate-600">
-                        {user.role || "Not specified"}
+                        {user?.role || "Not specified"}
                       </p>
                     </div>
                   </div>
@@ -298,17 +317,17 @@ function Dashboard() {
                   <div className="space-y-4 text-slate-700">
                     <div>
                       <p className="font-semibold">Email</p>
-                      <p>{user.email}</p>
+                      <p>{user?.email}</p>
                     </div>
 
                     <div>
                       <p className="font-semibold">Phone</p>
-                      <p>{user.phone || "Not specified"}</p>
+                      <p>{user?.phone || "Not specified"}</p>
                     </div>
 
                     <div>
                       <p className="font-semibold">Role</p>
-                      <p>{user.role || "Not specified"}</p>
+                      <p>{user?.role || "Not specified"}</p>
                     </div>
                   </div>
                 </div>
@@ -321,23 +340,23 @@ function Dashboard() {
                   <div className="space-y-4 text-slate-700">
                     <div>
                       <p className="font-semibold">City</p>
-                      <p>{user.city || "Not specified"}</p>
+                      <p>{user?.city || "Not specified"}</p>
                     </div>
 
                     <div>
                       <p className="font-semibold">Constituency</p>
-                      <p>{user.constituency || "Not specified"}</p>
+                      <p>{user?.constituency || "Not specified"}</p>
                     </div>
 
                     <div>
                       <p className="font-semibold">Area</p>
-                      <p>{user.area || "Not specified"}</p>
+                      <p>{user?.area || "Not specified"}</p>
                     </div>
 
                     <div>
                       <p className="font-semibold">Full Location</p>
                       <p>
-                        {user.city && user.constituency && user.area
+                        {user?.city && user?.constituency && user?.area
                           ? `${user.city}, ${user.constituency}, ${user.area}`
                           : "Not specified"}
                       </p>
@@ -376,7 +395,7 @@ function Dashboard() {
                       </label>
                       <input
                         type="text"
-                        defaultValue={user.name}
+                        defaultValue={user?.name}
                         className="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none focus:ring-2 focus:ring-sky-400"
                       />
                     </div>
@@ -387,7 +406,7 @@ function Dashboard() {
                       </label>
                       <input
                         type="email"
-                        defaultValue={user.email}
+                        defaultValue={user?.email}
                         className="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none focus:ring-2 focus:ring-sky-400"
                       />
                     </div>

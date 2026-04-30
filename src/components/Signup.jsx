@@ -1,33 +1,42 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "../lib/supabase";
-import { Link } from "react-router-dom";
 
-function Login() {
+function Signup() {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
     setLoading(true);
 
-    const { data: authData, error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        data: {
+          name: name,
+        },
+      },
     });
 
     setLoading(false);
 
-    if (!error) {
-      navigate("/dashboard");
-    } else {
+    if (error) {
       alert(error.message);
+      return;
     }
 
-    console.log("Logged in user:", authData.user);
-    console.log("User ID:", authData.user?.id);
+    console.log("Signup data:", data);
+    console.log("New user ID:", data.user?.id);
+    console.log("New user email:", data.user?.email);
+
+    alert("Account created successfully!");
+    navigate("/dashboard");
   };
 
   return (
@@ -37,9 +46,30 @@ function Login() {
           <h1 className="text-[2rem] text-slate-900 mb-1.5 font-bold">
             Tafuta
           </h1>
+          <p className="text-slate-500 text-sm">
+            Create your account to get started
+          </p>
         </div>
 
-        <form className="flex flex-col gap-[18px]" onSubmit={handleSubmit}>
+        <form className="flex flex-col gap-[18px]" onSubmit={handleSignup}>
+          <div className="flex flex-col gap-1.5">
+            <label
+              htmlFor="name"
+              className="text-[0.9rem] text-slate-700 font-semibold"
+            >
+              Full Name
+            </label>
+            <input
+              id="name"
+              type="text"
+              placeholder="Enter your full name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              className="px-[14px] py-[14px] rounded-xl border border-slate-300 text-base bg-slate-50 transition-all duration-200 ease-in-out focus:outline-none focus:border-blue-600 focus:bg-white focus:ring-4 focus:ring-blue-600/15"
+            />
+          </div>
+
           <div className="flex flex-col gap-1.5">
             <label
               htmlFor="email"
@@ -50,9 +80,10 @@ function Login() {
             <input
               id="email"
               type="email"
-              placeholder="Email"
+              placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              required
               className="px-[14px] py-[14px] rounded-xl border border-slate-300 text-base bg-slate-50 transition-all duration-200 ease-in-out focus:outline-none focus:border-blue-600 focus:bg-white focus:ring-4 focus:ring-blue-600/15"
             />
           </div>
@@ -67,29 +98,31 @@ function Login() {
             <input
               id="password"
               type="password"
-              placeholder="Password"
+              placeholder="Create a password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={6}
               className="px-[14px] py-[14px] rounded-xl border border-slate-300 text-base bg-slate-50 transition-all duration-200 ease-in-out focus:outline-none focus:border-blue-600 focus:bg-white focus:ring-4 focus:ring-blue-600/15"
             />
           </div>
 
           <button
-            className="mt-2.5 p-[14px] border-none rounded-xl bg-blue-600 text-white text-base font-bold cursor-pointer transition-all duration-200 ease-in-out hover:bg-blue-700 hover:-translate-y-0.5 active:translate-y-0"
+            className="mt-2.5 p-[14px] border-none rounded-xl bg-blue-600 text-white text-base font-bold cursor-pointer transition-all duration-200 ease-in-out hover:bg-blue-700 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-60 disabled:cursor-not-allowed"
             type="submit"
             disabled={loading}
           >
-            {loading ? "Logging in..." : "Login"}
+            {loading ? "Creating account..." : "Sign Up"}
           </button>
 
           <div className="mt-[18px] text-center">
             <p className="text-[0.9rem] text-slate-500">
-              Don't have an account?{" "}
+              Already have an account?{" "}
               <Link
-                to="/signup"
+                to="/"
                 className="text-blue-600 font-semibold no-underline hover:underline"
               >
-                Sign up
+                Login
               </Link>
             </p>
           </div>
@@ -99,4 +132,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default Signup;
