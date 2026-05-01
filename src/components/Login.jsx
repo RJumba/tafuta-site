@@ -1,13 +1,14 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "../lib/supabase";
-import { Link } from "react-router-dom";
+import { OpenEye, ClosedEye } from "lucide-react";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,14 +21,15 @@ function Login() {
 
     setLoading(false);
 
-    if (!error) {
-      navigate("/dashboard");
-    } else {
-      alert(error.message);
+    if (error || !authData?.user) {
+      alert(error?.message || "Login failed");
+      return;
     }
 
     console.log("Logged in user:", authData.user);
     console.log("User ID:", authData.user?.id);
+
+    navigate("/dashboard");
   };
 
   return (
@@ -64,14 +66,28 @@ function Login() {
             >
               Password
             </label>
-            <input
-              id="password"
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="px-[14px] py-[14px] rounded-xl border border-slate-300 text-base bg-slate-50 transition-all duration-200 ease-in-out focus:outline-none focus:border-blue-600 focus:bg-white focus:ring-4 focus:ring-blue-600/15"
-            />
+            <div>
+              <input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="px-[14px] py-[14px] rounded-xl border border-slate-300 text-base bg-slate-50 transition-all duration-200 ease-in-out focus:outline-none focus:border-blue-600 focus:bg-white focus:ring-4 focus:ring-blue-600/15"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="text-[0.9rem] text-blue-600 font-semibold hover:underline"
+              >
+                {showPassword ? (
+                  <ClosedEye className="w-4 h-4" />
+                ) : (
+                  <OpenEye className="w-4 h-4" />
+                )}{" "}
+                Password
+              </button>
+            </div>
           </div>
 
           <button
