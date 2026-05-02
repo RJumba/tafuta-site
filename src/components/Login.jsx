@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "../lib/supabase";
-import { OpenEye, ClosedEye } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -66,7 +66,7 @@ function Login() {
             >
               Password
             </label>
-            <div>
+            <div className="relative">
               <input
                 id="password"
                 type={showPassword ? "text" : "password"}
@@ -78,12 +78,12 @@ function Login() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="text-[0.9rem] text-blue-600 font-semibold hover:underline"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-blue-600"
               >
                 {showPassword ? (
-                  <ClosedEye className="w-4 h-4" />
+                  <EyeOff className="w-4 h-4" />
                 ) : (
-                  <OpenEye className="w-4 h-4" />
+                  <Eye className="w-4 h-4" />
                 )}{" "}
                 Password
               </button>

@@ -32,14 +32,22 @@ function Dashboard() {
       setUser({
         name: user.user_metadata?.name || "User",
         email: user.email,
-        profilePic: "https://via.placeholder.com/60",
+        profilePic: user.user_metadata?.avatar_url || null,
       });
     };
 
     getUser();
   }, [navigate]);
 
-  const handleLogout = async() => {
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-100 text-slate-700">
+        Loading dashboard...
+      </div>
+    );
+  }
+
+  const handleLogout = async () => {
     await supabase.auth.signOut();
     navigate("/");
     alert("Logged out successfully!");
@@ -65,15 +73,24 @@ function Dashboard() {
           </div>
 
           <div className="flex flex-col items-center border-b border-slate-700 pb-6">
-            <img
-              src={user?.profilePic}
-              alt="Profile"
-              className="w-14 h-14 rounded-full object-cover border-2 border-blue-500"
-            />
+            <div className="w-14 h-14 rounded-full border-2 border-blue-500 flex items-center justify-center bg-slate-200 overflow-hidden">
+              {user?.profilePic ? (
+                <img
+                  src={user.profilePic}
+                  alt="Profile"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <User className="w-7 h-7 text-slate-500" />
+              )}
+            </div>
+
             {isSidebarOpen && (
               <>
-                <h2 className="mt-3 text-base font-bold">{user?.name}</h2>
-                <p className="text-sm text-slate-300 text-center">
+                <h2 className="mt-3 text-base font-bold text-center">
+                  {user?.name}
+                </h2>
+                <p className="text-sm text-slate-300 text-center break-all">
                   {user?.email}
                 </p>
               </>
@@ -306,7 +323,7 @@ function Dashboard() {
                     />
                     <div>
                       <h2 className="text-2xl font-semibold text-slate-800">
-                        {user.name}
+                        {user?.name}
                       </h2>
                       <p className="text-slate-600">
                         {user?.role || "Not specified"}
