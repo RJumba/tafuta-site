@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import {
@@ -9,6 +9,7 @@ import {
   Settings,
   LogOut,
   Sliders,
+  FileInput,
 } from "lucide-react";
 
 function Dashboard() {
@@ -17,6 +18,8 @@ function Dashboard() {
   const [activeSection, setActiveSection] = useState("dashboard");
 
   const [user, setUser] = useState(null);
+  const fileInputRef = useRef(null);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
 
   useEffect(() => {
     const getUser = async () => {
@@ -30,6 +33,7 @@ function Dashboard() {
       }
 
       setUser({
+        id: user.id,
         name: user.user_metadata?.name || "User",
         email: user.email,
         profilePic: user.user_metadata?.avatar_url || null,
@@ -51,6 +55,45 @@ function Dashboard() {
     await supabase.auth.signOut();
     navigate("/");
     alert("Logged out successfully!");
+  };
+
+  const handleProfilePhotoChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploadingPhoto(true);
+
+    const filePath = `${user.id}/avatar-${Date.now()}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("avatars")
+      .upload(filePath, file, { upsert: true });
+
+    if (uploadError) {
+      setUploadingPhoto(false);
+      alert(uploadError.message);
+      return;
+    }
+
+    const { data } = supabase.storage.from("avatars").getPublicUrl(filePath);
+    const avatarUrl = data.publicUrl;
+
+    const { error: updateError } = await supabase
+      .from("profiles")
+      .update({ avatar_url: avatarUrl })
+      .eq("id", user.id);
+
+    setUploadingPhoto(false);
+
+    if (updateError) {
+      alert(updateError.message);
+      return;
+    }
+
+    setUser((prev) => ({
+      ...prev,
+      profilePic: avatarUrl,
+    }));
   };
 
   return (
@@ -316,11 +359,30 @@ function Dashboard() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="bg-white rounded-2xl shadow-md p-6">
                   <div className="flex items-center gap-6 mb-6">
-                    <img
-                      src={user?.profilePic}
-                      alt="Profile"
-                      className="w-24 h-24 rounded-full object-cover border-4 border-sky-500"
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleProfilePhotoChange}
+                      className="hidden"
+                      accept="image/*"
                     />
+
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploadingPhoto}
+                      className="w-24 h-24 rounded-full border-4 border-sky-500 flex items-center justify-center bg-slate-200 overflow-hidden"
+                    >
+                      {user?.profilePic ? (
+                        <img
+                          src={user.profilePic}
+                          alt="Profile"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <User className="w-10 h-10 text-slate-500" />
+                      )}
+                    </button>
                     <div>
                       <h2 className="text-2xl font-semibold text-slate-800">
                         {user?.name}
