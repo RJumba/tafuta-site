@@ -9,7 +9,6 @@ import {
   Settings,
   LogOut,
   Sliders,
-  FileInput,
 } from "lucide-react";
 
 function Dashboard() {
@@ -21,26 +20,49 @@ function Dashboard() {
   const fileInputRef = useRef(null);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
 
+  const loadUserProfile = async () => {
+    const {
+      data: { user: authUser },
+      error: userError,
+    } = await supabase.auth.getUser();
+
+    if (userError || !authUser) {
+      console.log("No logged-in user found");
+      navigate("/");
+      return;
+    }
+
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("id, full_name, email, avatar_url, city, area")
+      .eq("id", authUser.id)
+      .maybeSingle();
+
+    if (profileError) {
+      console.error("Profile fetch error:", profileError.message);
+    }
+
+    setUser({
+      id: authUser.id,
+      name:
+        profile?.full_name ||
+        authUser.user_metadata?.name ||
+        authUser.email?.split("@")[0] ||
+        "User",
+      email: profile?.email || authUser.email,
+      profilePic: profile?.avatar_url || null,
+      avatar_url: profile?.avatar_url || null,
+      city: profile?.city || "",
+      area: profile?.area || "",
+    });
+  };
+
   useEffect(() => {
-    const getUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user) {
-        navigate("/");
-        return;
-      }
-
-      setUser({
-        id: user.id,
-        name: user.user_metadata?.name || "User",
-        email: user.email,
-        profilePic: user.user_metadata?.avatar_url || null,
-      });
+    const initDashboard = async () => {
+      await loadUserProfile();
     };
 
-    getUser();
+    initDashboard();
   }, [navigate]);
 
   if (!user) {
@@ -61,9 +83,18 @@ function Dashboard() {
     const file = e.target.files[0];
     if (!file) return;
 
+    if (!user?.id) {
+      alert("You must be logged in first.");
+      return;
+    }
+
     setUploadingPhoto(true);
 
-    const filePath = `${user.id}/avatar-${Date.now()}`;
+    const fileExt = file.name.split(".").pop();
+    const filePath = `${user.id}/avatar-${Date.now()}.${fileExt}`;
+
+    console.log("Current user:", user);
+    console.log("Uploading to file path:", filePath);
 
     const { error: uploadError } = await supabase.storage
       .from("avatars")
@@ -71,28 +102,33 @@ function Dashboard() {
 
     if (uploadError) {
       setUploadingPhoto(false);
-      alert(uploadError.message);
+      console.error("UPLOAD ERROR:", uploadError);
+      alert("Upload error: " + uploadError.message);
       return;
     }
 
     const { data } = supabase.storage.from("avatars").getPublicUrl(filePath);
     const avatarUrl = data.publicUrl;
 
-    const { error: updateError } = await supabase
-      .from("profiles")
-      .update({ avatar_url: avatarUrl })
-      .eq("id", user.id);
+    const { error: updateError } = await supabase.from("profiles").upsert({
+      id: user.id,
+      email: user.email,
+      full_name: user.name,
+      avatar_url: avatarUrl,
+    });
 
     setUploadingPhoto(false);
 
     if (updateError) {
-      alert(updateError.message);
+      console.error("PROFILE UPDATE ERROR:", updateError);
+      alert("Profile update error: " + updateError.message);
       return;
     }
 
     setUser((prev) => ({
       ...prev,
       profilePic: avatarUrl,
+      avatar_url: avatarUrl,
     }));
   };
 
