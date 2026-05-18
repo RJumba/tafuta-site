@@ -20,6 +20,36 @@ function Dashboard() {
   const fileInputRef = useRef(null);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
 
+  const [housingOptions, setHousingOptions] = useState([]);
+
+  const [preferencesForm, setPreferencesForm] = useState({
+    min_rent: "",
+    max_rent: "",
+    preferred_loc_1: "",
+    preferred_loc_2: "",
+    preferred_loc_3: "",
+    housing_id: "",
+  });
+
+  const [notificationForm, setNotificationForm] = useState({
+    new_listings: true,
+    price_drop: true,
+    reminders: false,
+  });
+
+  const [privacyForm, setPrivacyForm] = useState({
+    show_profile: true,
+    save_search: true,
+  });
+
+  const [accountForm, setAccountForm] = useState({
+    full_name: "",
+    email: "",
+  });
+
+  const [savingPreferences, setSavingPreferences] = useState(false);
+  const [savingSettings, setSavingSettings] = useState(false);
+
   const loadUserProfile = async () => {
     const {
       data: { user: authUser },
@@ -42,7 +72,7 @@ function Dashboard() {
       console.error("Profile fetch error:", profileError.message);
     }
 
-    setUser({
+    const currentUser = {
       id: authUser.id,
       name:
         profile?.full_name ||
@@ -54,7 +84,86 @@ function Dashboard() {
       avatar_url: profile?.avatar_url || null,
       city: profile?.city || "",
       area: profile?.area || "",
+    };
+
+    setUser(currentUser);
+
+    setAccountForm({
+      full_name: currentUser.name || "",
+      email: currentUser.email || "",
     });
+
+    const { data: options, error: optionsError } = await supabase
+      .from("housing_options")
+      .select("id, name")
+      .order("id", { ascending: true });
+
+    if (optionsError) {
+      console.error("Housing options fetch error:", optionsError.message);
+    } else {
+      setHousingOptions(options || []);
+    }
+
+    const { data: preferences, error: preferencesError } = await supabase
+      .from("preferences")
+      .select(
+        "min_rent, max_rent, preferred_loc_1, preferred_loc_2, preferred_loc_3, housing_id",
+      )
+      .eq("user_id", authUser.id)
+      .maybeSingle();
+
+    if (preferencesError) {
+      console.error("Preferences fetch error:", preferencesError.message);
+    }
+
+    if (preferences) {
+      setPreferencesForm({
+        min_rent: preferences.min_rent || "",
+        max_rent: preferences.max_rent || "",
+        preferred_loc_1: preferences.preferred_loc_1 || "",
+        preferred_loc_2: preferences.preferred_loc_2 || "",
+        preferred_loc_3: preferences.preferred_loc_3 || "",
+        housing_id: preferences.housing_id || "",
+      });
+    }
+
+    const { data: notifications, error: notificationsError } = await supabase
+      .from("notification_settings")
+      .select("new_listings, price_drop, reminders")
+      .eq("user_id", authUser.id)
+      .maybeSingle();
+
+    if (notificationsError) {
+      console.error(
+        "Notification settings fetch error:",
+        notificationsError.message,
+      );
+    }
+
+    if (notifications) {
+      setNotificationForm({
+        new_listings: notifications.new_listings ?? true,
+        price_drop: notifications.price_drop ?? true,
+        reminders: notifications.reminders ?? false,
+      });
+    }
+
+    const { data: privacy, error: privacyError } = await supabase
+      .from("privacy_settings")
+      .select("show_profile, save_search")
+      .eq("user_id", authUser.id)
+      .maybeSingle();
+
+    if (privacyError) {
+      console.error("Privacy settings fetch error:", privacyError.message);
+    }
+
+    if (privacy) {
+      setPrivacyForm({
+        show_profile: privacy.show_profile ?? true,
+        save_search: privacy.save_search ?? true,
+      });
+    }
   };
 
   useEffect(() => {
@@ -93,16 +202,15 @@ function Dashboard() {
     const fileExt = file.name.split(".").pop();
     const filePath = `${user.id}/avatar-${Date.now()}.${fileExt}`;
 
-    console.log("Current user:", user);
-    console.log("Uploading to file path:", filePath);
-
     const { error: uploadError } = await supabase.storage
       .from("avatars")
-      .upload(filePath, file, { upsert: true });
+      .upload(filePath, file, {
+        upsert: true,
+      });
 
     if (uploadError) {
       setUploadingPhoto(false);
-      console.error("UPLOAD ERROR:", uploadError);
+      console.error("Upload error:", uploadError.message);
       alert("Upload error: " + uploadError.message);
       return;
     }
@@ -115,12 +223,14 @@ function Dashboard() {
       email: user.email,
       full_name: user.name,
       avatar_url: avatarUrl,
+      city: user.city,
+      area: user.area,
     });
 
     setUploadingPhoto(false);
 
     if (updateError) {
-      console.error("PROFILE UPDATE ERROR:", updateError);
+      console.error("Profile update error:", updateError.message);
       alert("Profile update error: " + updateError.message);
       return;
     }
@@ -130,16 +240,198 @@ function Dashboard() {
       profilePic: avatarUrl,
       avatar_url: avatarUrl,
     }));
+
+    alert("Profile photo updated successfully!");
+  };
+
+  const handlePreferencesChange = (e) => {
+    const { name, value } = e.target;
+
+    setPreferencesForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleHousingTypeSelect = (housingId) => {
+    setPreferencesForm((prev) => ({
+      ...prev,
+      housing_id: housingId,
+    }));
+  };
+
+  const savePreferences = async () => {
+    if (!user?.id) {
+      alert("You must be logged in first.");
+      return;
+    }
+
+    setSavingPreferences(true);
+
+    const payload = {
+      user_id: user.id,
+      min_rent:
+        preferencesForm.min_rent === ""
+          ? null
+          : Number(preferencesForm.min_rent),
+      max_rent:
+        preferencesForm.max_rent === ""
+          ? null
+          : Number(preferencesForm.max_rent),
+      preferred_loc_1: preferencesForm.preferred_loc_1 || null,
+      preferred_loc_2: preferencesForm.preferred_loc_2 || null,
+      preferred_loc_3: preferencesForm.preferred_loc_3 || null,
+      housing_id:
+        preferencesForm.housing_id === ""
+          ? null
+          : Number(preferencesForm.housing_id),
+    };
+
+    const { error } = await supabase.from("preferences").upsert(payload, {
+      onConflict: "user_id",
+    });
+
+    setSavingPreferences(false);
+
+    if (error) {
+      console.error("Save preferences error:", error.message);
+      alert("Save preferences error: " + error.message);
+      return;
+    }
+
+    alert("Preferences saved successfully!");
+  };
+
+  const handleNotificationChange = (e) => {
+    const { name, checked } = e.target;
+
+    setNotificationForm((prev) => ({
+      ...prev,
+      [name]: checked,
+    }));
+  };
+
+  const handlePrivacyChange = (e) => {
+    const { name, checked } = e.target;
+
+    setPrivacyForm((prev) => ({
+      ...prev,
+      [name]: checked,
+    }));
+  };
+
+  const handleAccountChange = (e) => {
+    const { name, value } = e.target;
+
+    setAccountForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const saveAccountSettings = async () => {
+    if (!user?.id) {
+      alert("You must be logged in first.");
+      return;
+    }
+
+    setSavingSettings(true);
+
+    const { error } = await supabase.from("profiles").upsert({
+      id: user.id,
+      full_name: accountForm.full_name,
+      email: accountForm.email,
+      avatar_url: user.avatar_url,
+      city: user.city,
+      area: user.area,
+    });
+
+    setSavingSettings(false);
+
+    if (error) {
+      console.error("Save account settings error:", error.message);
+      alert("Save account settings error: " + error.message);
+      return;
+    }
+
+    setUser((prev) => ({
+      ...prev,
+      name: accountForm.full_name,
+      email: accountForm.email,
+    }));
+
+    alert("Account settings saved successfully!");
+  };
+
+  const saveNotificationSettings = async () => {
+    if (!user?.id) {
+      alert("You must be logged in first.");
+      return;
+    }
+
+    setSavingSettings(true);
+
+    const { error } = await supabase.from("notification_settings").upsert(
+      {
+        user_id: user.id,
+        new_listings: notificationForm.new_listings,
+        price_drop: notificationForm.price_drop,
+        reminders: notificationForm.reminders,
+      },
+      {
+        onConflict: "user_id",
+      },
+    );
+
+    setSavingSettings(false);
+
+    if (error) {
+      console.error("Save notification settings error:", error.message);
+      alert("Save notification settings error: " + error.message);
+      return;
+    }
+
+    alert("Notification settings saved successfully!");
+  };
+
+  const savePrivacySettings = async () => {
+    if (!user?.id) {
+      alert("You must be logged in first.");
+      return;
+    }
+
+    setSavingSettings(true);
+
+    const { error } = await supabase.from("privacy_settings").upsert(
+      {
+        user_id: user.id,
+        show_profile: privacyForm.show_profile,
+        save_search: privacyForm.save_search,
+      },
+      {
+        onConflict: "user_id",
+      },
+    );
+
+    setSavingSettings(false);
+
+    if (error) {
+      console.error("Save privacy settings error:", error.message);
+      alert("Save privacy settings error: " + error.message);
+      return;
+    }
+
+    alert("Privacy settings saved successfully!");
   };
 
   return (
     <div className="flex min-h-screen bg-slate-100">
       <aside
-        className={`bg-slate-900 text-white flex flex-col justify-between p-4 shadow-xl transition-all duration-300 ${
+        className={`sticky top-0 h-screen bg-slate-900 text-white flex flex-col justify-between p-4 shadow-xl transition-all duration-300 overflow-hidden ${
           isSidebarOpen ? "w-72" : "w-20"
         }`}
       >
-        <div>
+        <div className="flex-1 overflow-y-auto pr-1">
           <div className="flex items-center justify-between mb-6">
             {isSidebarOpen && <h2 className="text-lg font-bold">Tafuta</h2>}
             <button
@@ -241,15 +533,15 @@ function Dashboard() {
 
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-3 py-3 rounded-xl bg-red-500 hover:bg-red-600 transition"
+          className="mt-4 w-full flex items-center gap-3 px-3 py-3 rounded-xl bg-red-500 hover:bg-red-600 transition shrink-0"
         >
           <LogOut size={20} />
           {isSidebarOpen && <span>Logout</span>}
         </button>
       </aside>
 
-      <div className="flex-1 flex flex-col">
-        <div className="bg-white shadow-sm px-6 py-4 flex items-center justify-between">
+      <div className="flex-1 flex flex-col min-w-0">
+        <div className="sticky top-0 z-20 bg-white shadow-sm px-6 py-4 flex items-center justify-between">
           <h1 className="text-3xl font-bold text-slate-800 mb-4">Tafuta</h1>
           <input
             className="bg-slate-900 text-slate-300 placeholder:text-slate-500 border border-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-xl p-3 focus:border-blue-500 w-80 transition"
@@ -510,7 +802,9 @@ function Dashboard() {
                       </label>
                       <input
                         type="text"
-                        defaultValue={user?.name}
+                        name="full_name"
+                        value={accountForm.full_name}
+                        onChange={handleAccountChange}
                         className="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none focus:ring-2 focus:ring-sky-400"
                       />
                     </div>
@@ -521,13 +815,20 @@ function Dashboard() {
                       </label>
                       <input
                         type="email"
-                        defaultValue={user?.email}
+                        name="email"
+                        value={accountForm.email}
+                        onChange={handleAccountChange}
                         className="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none focus:ring-2 focus:ring-sky-400"
                       />
                     </div>
 
-                    <button className="px-5 py-3 rounded-xl bg-sky-500 text-white hover:bg-sky-600 transition">
-                      Save Account Changes
+                    <button
+                      type="button"
+                      onClick={saveAccountSettings}
+                      disabled={savingSettings}
+                      className="px-5 py-3 rounded-xl bg-sky-500 text-white hover:bg-sky-600 transition disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                      {savingSettings ? "Saving..." : "Save Account Changes"}
                     </button>
                   </div>
                 </div>
@@ -552,7 +853,9 @@ function Dashboard() {
                       </div>
                       <input
                         type="checkbox"
-                        defaultChecked
+                        name="new_listings"
+                        checked={notificationForm.new_listings}
+                        onChange={handleNotificationChange}
                         className="w-5 h-5"
                       />
                     </label>
@@ -568,7 +871,9 @@ function Dashboard() {
                       </div>
                       <input
                         type="checkbox"
-                        defaultChecked
+                        name="price_drop"
+                        checked={notificationForm.price_drop}
+                        onChange={handleNotificationChange}
                         className="w-5 h-5"
                       />
                     </label>
@@ -582,8 +887,25 @@ function Dashboard() {
                           Remind me about upcoming house viewings.
                         </p>
                       </div>
-                      <input type="checkbox" className="w-5 h-5" />
+                      <input
+                        type="checkbox"
+                        name="reminders"
+                        checked={notificationForm.reminders}
+                        onChange={handleNotificationChange}
+                        className="w-5 h-5"
+                      />
                     </label>
+
+                    <button
+                      type="button"
+                      onClick={saveNotificationSettings}
+                      disabled={savingSettings}
+                      className="px-5 py-3 rounded-xl bg-sky-500 text-white hover:bg-sky-600 transition disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                      {savingSettings
+                        ? "Saving..."
+                        : "Save Notification Settings"}
+                    </button>
                   </div>
                 </div>
 
@@ -607,7 +929,9 @@ function Dashboard() {
                       </div>
                       <input
                         type="checkbox"
-                        defaultChecked
+                        name="show_profile"
+                        checked={privacyForm.show_profile}
+                        onChange={handlePrivacyChange}
                         className="w-5 h-5"
                       />
                     </label>
@@ -624,10 +948,21 @@ function Dashboard() {
                       </div>
                       <input
                         type="checkbox"
-                        defaultChecked
+                        name="save_search"
+                        checked={privacyForm.save_search}
+                        onChange={handlePrivacyChange}
                         className="w-5 h-5"
                       />
                     </label>
+
+                    <button
+                      type="button"
+                      onClick={savePrivacySettings}
+                      disabled={savingSettings}
+                      className="px-5 py-3 rounded-xl bg-slate-800 text-white hover:bg-slate-900 transition disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                      {savingSettings ? "Saving..." : "Save Privacy Settings"}
+                    </button>
                   </div>
                 </div>
 
@@ -857,6 +1192,9 @@ function Dashboard() {
                       </label>
                       <input
                         type="number"
+                        name="min_rent"
+                        value={preferencesForm.min_rent}
+                        onChange={handlePreferencesChange}
                         placeholder="e.g. 15000"
                         className="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none focus:ring-2 focus:ring-sky-400"
                       />
@@ -868,6 +1206,9 @@ function Dashboard() {
                       </label>
                       <input
                         type="number"
+                        name="max_rent"
+                        value={preferencesForm.max_rent}
+                        onChange={handlePreferencesChange}
                         placeholder="e.g. 50000"
                         className="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none focus:ring-2 focus:ring-sky-400"
                       />
@@ -887,16 +1228,27 @@ function Dashboard() {
                   <div className="space-y-4">
                     <input
                       type="text"
+                      name="preferred_loc_1"
+                      value={preferencesForm.preferred_loc_1}
+                      onChange={handlePreferencesChange}
                       placeholder="First choice location"
                       className="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none focus:ring-2 focus:ring-sky-400"
                     />
+
                     <input
                       type="text"
+                      name="preferred_loc_2"
+                      value={preferencesForm.preferred_loc_2}
+                      onChange={handlePreferencesChange}
                       placeholder="Second choice location"
                       className="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none focus:ring-2 focus:ring-sky-400"
                     />
+
                     <input
                       type="text"
+                      name="preferred_loc_3"
+                      value={preferencesForm.preferred_loc_3}
+                      onChange={handlePreferencesChange}
                       placeholder="Third choice location"
                       className="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none focus:ring-2 focus:ring-sky-400"
                     />
@@ -913,29 +1265,37 @@ function Dashboard() {
                 </p>
 
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  <button className="px-4 py-3 rounded-xl border border-slate-300 hover:bg-sky-50 hover:border-sky-400 transition text-slate-700">
-                    Bedsitter
-                  </button>
-                  <button className="px-4 py-3 rounded-xl border border-slate-300 hover:bg-sky-50 hover:border-sky-400 transition text-slate-700">
-                    Studio Apartment
-                  </button>
-                  <button className="px-4 py-3 rounded-xl border border-slate-300 hover:bg-sky-50 hover:border-sky-400 transition text-slate-700">
-                    One Bedroom
-                  </button>
-                  <button className="px-4 py-3 rounded-xl border border-slate-300 hover:bg-sky-50 hover:border-sky-400 transition text-slate-700">
-                    Two Bedroom
-                  </button>
-                  <button className="px-4 py-3 rounded-xl border border-slate-300 hover:bg-sky-50 hover:border-sky-400 transition text-slate-700">
-                    Three Bedroom
-                  </button>
-                  <button className="px-4 py-3 rounded-xl border border-slate-300 hover:bg-sky-50 hover:border-sky-400 transition text-slate-700">
-                    Single Room
-                  </button>
-                  <button className="px-4 py-3 rounded-xl border border-slate-300 hover:bg-sky-50 hover:border-sky-400 transition text-slate-700">
-                    Maisonette
-                  </button>
-                  <button className="px-4 py-3 rounded-xl border border-slate-300 hover:bg-sky-50 hover:border-sky-400 transition text-slate-700">
-                    Bungalow
+                  {housingOptions.map((option) => (
+                    <button
+                      key={option.id}
+                      type="button"
+                      onClick={() => handleHousingTypeSelect(option.id)}
+                      className={`px-4 py-3 rounded-xl border transition text-slate-700 ${
+                        Number(preferencesForm.housing_id) === Number(option.id)
+                          ? "bg-sky-500 text-white border-sky-500"
+                          : "border-slate-300 hover:bg-sky-50 hover:border-sky-400"
+                      }`}
+                    >
+                      {option.name}
+                    </button>
+                  ))}
+                </div>
+
+                {housingOptions.length === 0 && (
+                  <p className="mt-4 text-sm text-red-500">
+                    No housing options found. Add records in the housing_options
+                    table.
+                  </p>
+                )}
+
+                <div className="mt-8 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={savePreferences}
+                    disabled={savingPreferences}
+                    className="px-6 py-3 rounded-xl bg-sky-500 text-white hover:bg-sky-600 transition disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    {savingPreferences ? "Saving..." : "Save Preferences"}
                   </button>
                 </div>
               </div>
