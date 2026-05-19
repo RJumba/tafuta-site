@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import { Eye, EyeOff } from "lucide-react";
+import backgroundImage from "../assets/orig.jpg";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -33,7 +34,11 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen flex justify-center items-center p-5 bg-gradient-to-br from-slate-900 to-slate-800">
+    <div className="min-h-screen flex justify-center items-center p-5 bg-gradient-to-br from-slate-900 to-slate-800"
+    style={{
+      backgroundImage: `url(${backgroundImage})`,
+    }}
+    >
       <div className="w-full max-w-[420px] bg-white rounded-[20px] px-7 py-8 shadow-2xl animate-[fadeIn_1s_ease]">
         <div className="text-center mb-6 text-slate-900">
           <h1 className="text-[2rem] text-slate-900 mb-1.5 font-bold">
