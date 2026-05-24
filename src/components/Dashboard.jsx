@@ -10,6 +10,7 @@ import {
   LogOut,
   Sliders,
 } from "lucide-react";
+import Footer from "./Footer.jsx";
 
 function Dashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -425,7 +426,8 @@ function Dashboard() {
   };
 
   return (
-    <div className="flex min-h-screen bg-slate-100">
+    <div className="min-h-screen bg-slate-100 flex flex-col">
+      <div className="flex min-h-screen">
       <aside
         className={`sticky top-0 h-screen bg-slate-900 text-white flex flex-col justify-between p-4 shadow-xl transition-all duration-300 overflow-hidden ${
           isSidebarOpen ? "w-72" : "w-20"
@@ -1303,7 +1305,13 @@ function Dashboard() {
           )}
         </main>
       </div>
+      </div>
+      
+      <Footer />
+    
     </div>
+
+      
   );
 }
 

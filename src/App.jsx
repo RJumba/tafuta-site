@@ -1,7 +1,11 @@
 import Login from "./components/Login";
 
 function App() {
-  return <Login />
+  return (
+    <div className="flex min-h-screen flex-col">
+      <Login />
+    </div>
+  );
 }
 
 export default App
