@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import './index.css'
 import 'lucide-react'
+import "leaflet/dist/leaflet.css";
 
 import App from './App.jsx'
 import Dashboard from './components/dashboard.jsx'
