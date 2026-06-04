@@ -9,15 +9,13 @@ export default function HousingMap() {
   const defaultCenter = [0.5143, 35.2698]; // Eldoret town
 
   useEffect(() => {
-    fetchHousingLocations();
-  }, []);
+    async function fetchHousingLocations() {
+      setLoading(true);
 
-  async function fetchHousingLocations() {
-    setLoading(true);
-
-    const { data, error } = await supabase
-      .from("housing_listings")
-      .select(`
+      const { data, error } = await supabase
+        .from("housing_listings")
+        .select(
+          `
         id,
         title,
         description,
@@ -30,20 +28,23 @@ export default function HousingMap() {
           id,
           name
         )
-      `)
-      .eq("is_available", true)
-      .order("id", { ascending: true });
+      `,
+        )
+        .eq("is_available", true)
+        .order("id", { ascending: true });
 
-    if (error) {
-      console.error("Error fetching housing map data:", error.message);
-      setHousingLocations([]);
-    } else {
-      setHousingLocations(data || []);
+      if (error) {
+        console.error("Error fetching housing map data:", error.message);
+        setHousingLocations([]);
+      } else {
+        setHousingLocations(data || []);
+      }
+
+      setLoading(false);
     }
 
-    setLoading(false);
-  }
-
+    fetchHousingLocations();
+  }, []);
   if (loading) {
     return (
       <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-md">
@@ -53,16 +54,19 @@ export default function HousingMap() {
   }
 
   if (housingLocations.length === 0) {
-    return (
-      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-md">
-        <h2 className="text-xl font-bold text-slate-800">Housing Map</h2>
-        <p className="mt-2 text-slate-600">
-          No housing locations found. Add records in the housing_listings table
-          with latitude and longitude.
-        </p>
-      </div>
-    );
-  }
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-md">
+      <h2 className="text-xl font-bold text-slate-800">
+        No Listings Available Yet
+      </h2>
+
+      <p className="mx-auto mt-3 max-w-md text-slate-600">
+        We are currently preparing available housing locations for this area.
+        Please check back soon for updated listings.
+      </p>
+    </div>
+  );
+}
 
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-md">

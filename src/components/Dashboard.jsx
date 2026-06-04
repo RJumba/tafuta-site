@@ -11,6 +11,7 @@ import {
   Sliders,
 } from "lucide-react";
 import Footer from "./Footer.jsx";
+import HousingMap from "./HousingMap.jsx";
 
 function Dashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -564,6 +565,8 @@ function Dashboard() {
                   housing activity.
                 </p>
               </div>
+
+              <HousingMap />
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="bg-white rounded-2xl shadow-md p-6 border border-slate-200">
