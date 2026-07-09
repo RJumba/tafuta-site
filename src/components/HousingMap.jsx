@@ -69,7 +69,7 @@ export default function HousingMap() {
 }
 
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-md">
+    <section className="relative z-0 isolate rounded-2xl border border-slate-200 bg-white p-6 shadow-md">
       <div className="mb-5">
         <h2 className="text-2xl font-bold text-slate-800">
           Housing Locations Map
@@ -79,12 +79,12 @@ export default function HousingMap() {
         </p>
       </div>
 
-      <div className="h-[430px] overflow-hidden rounded-2xl border border-slate-200">
+      <div className="relative z-0 h-[430px] overflow-hidden rounded-2xl border border-slate-200">
         <MapContainer
           center={defaultCenter}
           zoom={12}
           scrollWheelZoom={false}
-          className="h-full w-full"
+          className="relative z-0 h-full w-full"
         >
           <TileLayer
             attribution="&copy; OpenStreetMap contributors"

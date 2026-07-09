@@ -14,9 +14,36 @@ import Footer from "./Footer.jsx";
 import HousingMap from "./HousingMap.jsx";
 
 function Dashboard() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState("dashboard");
+  const navItems = [
+  {
+    key: "dashboard",
+    label: "Dashboard",
+    icon: LayoutDashboard,
+  },
+  {
+    key: "profile",
+    label: "Profile",
+    icon: User,
+  },
+  {
+    key: "preferences",
+    label: "Preferences",
+    icon: Sliders,
+  },
+  {
+    key: "settings",
+    label: "Settings",
+    icon: Settings,
+  },
+  {
+    key: "history",
+    label: "Search History",
+    icon: History,
+  },
+ ];
 
   const [user, setUser] = useState(null);
   const fileInputRef = useRef(null);
@@ -441,27 +468,60 @@ function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 flex flex-col">
-      <div className="flex min-h-screen">
-        <aside
-          className={`sticky top-0 h-screen bg-slate-900 text-white flex flex-col justify-between p-4 shadow-xl transition-all duration-300 overflow-hidden ${
-            isSidebarOpen ? "w-72" : "w-20"
-          }`}
-        >
-          <div className="flex-1 overflow-y-auto pr-1">
-            <div className="flex items-center justify-between mb-6">
-              {isSidebarOpen && <h2 className="text-lg font-bold">Tafuta</h2>}
-              <button
-                type="button"
-                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                className="shrink-0 w-10 h-10 flex items-center justify-center rounded-lg bg-slate-700 hover:bg-slate-600 text-white border border-slate-500"
-              >
-                <Menu size={20} />
-              </button>
+  <div className="min-h-screen bg-slate-100 flex flex-col">
+    <header className="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-sm">
+      <div className="px-4 lg:px-8 py-4">
+        <div className="flex items-center justify-between gap-4">
+          {/* Left: Brand */}
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-slate-900 text-white flex items-center justify-center font-bold">
+              T
             </div>
 
-            <div className="flex flex-col items-center border-b border-slate-700 pb-6">
-              <div className="w-14 h-14 rounded-full border-2 border-blue-500 flex items-center justify-center bg-slate-200 overflow-hidden">
+            <div>
+              <h1 className="text-xl lg:text-2xl font-bold text-slate-900">
+                Tafuta
+              </h1>
+              <p className="hidden sm:block text-xs text-slate-500">
+                Real estate dashboard
+              </p>
+            </div>
+          </div>
+
+          {/* Center: Desktop navigation */}
+          <nav className="hidden lg:flex items-center gap-2 bg-slate-100 p-1.5 rounded-2xl">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = activeSection === item.key;
+
+              return (
+                <button
+                  key={item.key}
+                  type="button"
+                  onClick={() => setActiveSection(item.key)}
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition ${
+                    isActive
+                      ? "bg-slate-900 text-white shadow-sm"
+                      : "text-slate-600 hover:bg-white hover:text-slate-900"
+                  }`}
+                >
+                  <Icon size={18} />
+                  <span>{item.label}</span>
+                </button>
+              );
+            })}
+          </nav>
+
+          {/* Right: Search + profile + logout */}
+          <div className="flex items-center gap-3">
+            <input
+              className="hidden xl:block bg-slate-100 text-slate-700 placeholder:text-slate-400 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-400 rounded-xl px-4 py-2.5 w-72 transition"
+              type="text"
+              placeholder="Search houses, locations..."
+            />
+
+            <div className="hidden md:flex items-center gap-3 pl-3 border-l border-slate-200">
+              <div className="w-10 h-10 rounded-full bg-slate-200 overflow-hidden flex items-center justify-center">
                 {user?.profilePic ? (
                   <img
                     src={user.profilePic}
@@ -469,103 +529,102 @@ function Dashboard() {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <User className="w-7 h-7 text-slate-500" />
+                  <User className="w-5 h-5 text-slate-500" />
                 )}
               </div>
 
-              {isSidebarOpen && (
-                <>
-                  <h2 className="mt-3 text-base font-bold text-center">
-                    {user?.name}
-                  </h2>
-                  <p className="text-sm text-slate-300 text-center break-all">
-                    {user?.email}
-                  </p>
-                </>
-              )}
+              <div className="hidden xl:block">
+                <p className="text-sm font-semibold text-slate-800">
+                  {user?.name}
+                </p>
+                <p className="text-xs text-slate-500 max-w-[160px] truncate">
+                  {user?.email}
+                </p>
+              </div>
             </div>
 
-            <nav className="mt-6 space-y-3">
-              <button
-                onClick={() => setActiveSection("dashboard")}
-                className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl  ${
-                  activeSection === "dashboard"
-                    ? "bg-slate-700"
-                    : "hover:bg-slate-800 transition"
-                }`}
-              >
-                <LayoutDashboard size={20} />
-                {isSidebarOpen && <span>Dashboard</span>}
-              </button>
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="hidden md:flex items-center gap-2 px-4 py-2.5 rounded-xl bg-red-500 text-white hover:bg-red-600 transition text-sm font-medium"
+            >
+              <LogOut size={18} />
+              Logout
+            </button>
+
+            {/* Mobile menu button */}
+            <button
+              type="button"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="lg:hidden w-10 h-10 flex items-center justify-center rounded-xl bg-slate-900 text-white"
+            >
+              <Menu size={20} />
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile menu */}
+        {isMobileMenuOpen && (
+          <div className="lg:hidden mt-4 bg-slate-900 rounded-2xl p-3 text-white">
+            <div className="flex items-center gap-3 px-2 py-3 border-b border-slate-700 mb-3">
+              <div className="w-11 h-11 rounded-full bg-slate-200 overflow-hidden flex items-center justify-center">
+                {user?.profilePic ? (
+                  <img
+                    src={user.profilePic}
+                    alt="Profile"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <User className="w-5 h-5 text-slate-500" />
+                )}
+              </div>
+
+              <div className="min-w-0">
+                <p className="text-sm font-semibold truncate">{user?.name}</p>
+                <p className="text-xs text-slate-300 truncate">
+                  {user?.email}
+                </p>
+              </div>
+            </div>
+
+            <nav className="space-y-2">
+              {navItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = activeSection === item.key;
+
+                return (
+                  <button
+                    key={item.key}
+                    type="button"
+                    onClick={() => {
+                      setActiveSection(item.key);
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition ${
+                      isActive
+                        ? "bg-sky-500 text-white"
+                        : "text-slate-200 hover:bg-slate-800"
+                    }`}
+                  >
+                    <Icon size={18} />
+                    <span>{item.label}</span>
+                  </button>
+                );
+              })}
 
               <button
-                onClick={() => setActiveSection("profile")}
-                className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl transition ${
-                  activeSection === "profile"
-                    ? "bg-sky-500 text-white"
-                    : "hover:bg-slate-800"
-                }`}
+                type="button"
+                onClick={handleLogout}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-red-500 hover:bg-red-600 transition text-sm font-medium"
               >
-                <User size={20} />
-                {isSidebarOpen && <span>Profile</span>}
-              </button>
-
-              <button
-                onClick={() => setActiveSection("preferences")}
-                className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl transition ${
-                  activeSection === "preferences"
-                    ? "bg-sky-500 text-white"
-                    : "hover:bg-slate-800"
-                }`}
-              >
-                <Sliders size={20} />
-                {isSidebarOpen && <span>Preferences</span>}
-              </button>
-
-              <button
-                onClick={() => setActiveSection("settings")}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition ${
-                  activeSection === "settings"
-                    ? "bg-sky-500 text-white"
-                    : "hover:bg-slate-800"
-                }`}
-              >
-                <Settings size={20} />
-                {isSidebarOpen && <span>Settings</span>}
-              </button>
-
-              <button
-                onClick={() => setActiveSection("history")}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition ${
-                  activeSection === "history"
-                    ? "bg-sky-500 text-white"
-                    : "hover:bg-slate-800"
-                }`}
-              >
-                <History size={20} />
-                {isSidebarOpen && <span>Search History</span>}
+                <LogOut size={18} />
+                <span>Logout</span>
               </button>
             </nav>
           </div>
-
-          <button
-            onClick={handleLogout}
-            className="mt-4 w-full flex items-center gap-3 px-3 py-3 rounded-xl bg-red-500 hover:bg-red-600 transition shrink-0"
-          >
-            <LogOut size={20} />
-            {isSidebarOpen && <span>Logout</span>}
-          </button>
-        </aside>
-
-        <div className="flex-1 flex flex-col min-w-0">
-          <div className="sticky top-0 z-20 bg-white shadow-sm px-6 py-4 flex items-center justify-between">
-            <h1 className="text-3xl font-bold text-slate-800 mb-4">Tafuta</h1>
-            <input
-              className="bg-slate-900 text-slate-300 placeholder:text-slate-500 border border-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-xl p-3 focus:border-blue-500 w-80 transition"
-              type="text"
-              placeholder="Search houses, locations,etc..."
-            />
-          </div>
+        )}
+      </div>
+    </header>
 
           <main className="flex-1 p-8">
             {activeSection === "dashboard" && (
@@ -1332,8 +1391,8 @@ function Dashboard() {
               </div>
             )}
           </main>
-        </div>
-      </div>
+        
+      
 
       <Footer />
     </div>
