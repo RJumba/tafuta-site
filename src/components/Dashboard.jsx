@@ -2,8 +2,6 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import {
-  LayoutDashboard,
-  History,
   Menu,
   User,
   Settings,
@@ -16,34 +14,25 @@ import HousingMap from "./HousingMap.jsx";
 function Dashboard() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
-  const [activeSection, setActiveSection] = useState("dashboard");
+  const [activeSection, setActiveSection] = useState("profile");
+
   const navItems = [
-  {
-    key: "dashboard",
-    label: "Dashboard",
-    icon: LayoutDashboard,
-  },
-  {
-    key: "profile",
-    label: "Profile",
-    icon: User,
-  },
-  {
-    key: "preferences",
-    label: "Preferences",
-    icon: Sliders,
-  },
-  {
-    key: "settings",
-    label: "Settings",
-    icon: Settings,
-  },
-  {
-    key: "history",
-    label: "Search History",
-    icon: History,
-  },
- ];
+    {
+      key: "profile",
+      label: "Profile",
+      icon: User,
+    },
+    {
+      key: "preferences",
+      label: "Preferences",
+      icon: Sliders,
+    },
+    {
+      key: "settings",
+      label: "Settings",
+      icon: Settings,
+    },
+  ];
 
   const [user, setUser] = useState(null);
   const fileInputRef = useRef(null);
@@ -498,7 +487,10 @@ function Dashboard() {
                 <button
                   key={item.key}
                   type="button"
-                  onClick={() => setActiveSection(item.key)}
+                  onClick={() => {
+                    setActiveSection(item.key);
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
                   className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition ${
                     isActive
                       ? "bg-slate-900 text-white shadow-sm"
@@ -599,6 +591,7 @@ function Dashboard() {
                     onClick={() => {
                       setActiveSection(item.key);
                       setIsMobileMenuOpen(false);
+                      window.scrollTo({ top: 0, behavior: "smooth" });
                     }}
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition ${
                       isActive
@@ -627,236 +620,536 @@ function Dashboard() {
     </header>
 
           <main className="flex-1 p-8">
-            {activeSection === "dashboard" && (
-              <div className="space-y-8">
-                <div>
-                  <h1 className="text-3xl font-bold text-slate-800 mb-2">
-                    Dashboard
-                  </h1>
-                  <p className="text-slate-600">
-                    Welcome back, {user?.name}. Here is a quick overview of your
-                    housing activity.
-                  </p>
-                </div>
+            {activeSection === "profile" && (
+              <div className="space-y-16">
+                <section id="profile">
+                <div className="space-y-6">
+                  <div>
+                    <h1 className="text-3xl font-bold text-slate-800 mb-2">
+                      My Profile
+                    </h1>
+                    <p className="text-slate-600">
+                      View your personal and location details here.
+                    </p>
+                  </div>
 
-                <HousingMap />
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="bg-white rounded-2xl shadow-md p-6">
+                      <div className="flex items-center gap-6 mb-6">
+                        <input
+                          type="file"
+                          ref={fileInputRef}
+                          onChange={handleProfilePhotoChange}
+                          className="hidden"
+                          accept="image/*"
+                        />
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="bg-white rounded-2xl shadow-md p-6 border border-slate-200">
-                    <div className="flex items-center justify-between mb-4">
-                      <h2 className="text-xl font-semibold text-slate-800">
-                        Saved Homes
+                        <button
+                          type="button"
+                          onClick={() => fileInputRef.current?.click()}
+                          disabled={uploadingPhoto}
+                          className="w-24 h-24 rounded-full border-4 border-sky-500 flex items-center justify-center bg-slate-200 overflow-hidden"
+                        >
+                          {user?.profilePic ? (
+                            <img
+                              src={user.profilePic}
+                              alt="Profile"
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <User className="w-10 h-10 text-slate-500" />
+                          )}
+                        </button>
+                        <div>
+                          <h2 className="text-2xl font-semibold text-slate-800">
+                            {user?.name}
+                          </h2>
+                          <p className="text-slate-600">
+                            {user?.role || "Not specified"}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-4 text-slate-700">
+                        <div>
+                          <p className="font-semibold">Email</p>
+                          <p>{user?.email}</p>
+                        </div>
+
+                        <div>
+                          <p className="font-semibold">Phone</p>
+                          <p>{user?.phone || "Not specified"}</p>
+                        </div>
+
+                        <div>
+                          <p className="font-semibold">Role</p>
+                          <p>{user?.role || "Not specified"}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-white rounded-2xl shadow-md p-6">
+                      <h2 className="text-2xl font-semibold text-slate-800 mb-6">
+                        Location Details
                       </h2>
-                      <span className="text-sm bg-sky-100 text-sky-700 px-3 py-1 rounded-full">
-                        12 Homes
-                      </span>
+
+                      <div className="space-y-4 text-slate-700">
+                        <div>
+                          <p className="font-semibold">City</p>
+                          <p>{user?.city || "Not specified"}</p>
+                        </div>
+
+                        <div>
+                          <p className="font-semibold">Constituency</p>
+                          <p>{user?.constituency || "Not specified"}</p>
+                        </div>
+
+                        <div>
+                          <p className="font-semibold">Area</p>
+                          <p>{user?.area || "Not specified"}</p>
+                        </div>
+
+                        <div>
+                          <p className="font-semibold">Full Location</p>
+                          <p>
+                            {user?.city && user?.constituency && user?.area
+                              ? `${user.city}, ${user.constituency}, ${user.area}`
+                              : "Not specified"}
+                          </p>
+                        </div>
+                      </div>
                     </div>
-                    <p className="text-slate-600 mb-6">
-                      Homes you have saved for later comparison and review.
+                  </div>
+                </div>
+                </section>
+
+                <section id="dashboard">
+                <div className="space-y-8">
+                  <div>
+                    <h1 className="text-3xl font-bold text-slate-800 mb-2">
+                      Dashboard
+                    </h1>
+                    <p className="text-slate-600">
+                      Welcome back, {user?.name}. Here is a quick overview of your
+                      housing activity.
                     </p>
+                  </div>
 
-                    <div className="space-y-3">
-                      <div className="bg-slate-50 rounded-xl p-4">
-                        <p className="font-medium text-slate-800">
-                          2 Bedroom Apartment - Kilimani
-                        </p>
-                        <p className="text-sm text-slate-500">
-                          KES 45,000/month
-                        </p>
+                  <HousingMap />
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="bg-white rounded-2xl shadow-md p-6 border border-slate-200">
+                      <div className="flex items-center justify-between mb-4">
+                        <h2 className="text-xl font-semibold text-slate-800">
+                          Saved Homes
+                        </h2>
+                        <span className="text-sm bg-sky-100 text-sky-700 px-3 py-1 rounded-full">
+                          12 Homes
+                        </span>
                       </div>
-                      <div className="bg-slate-50 rounded-xl p-4">
-                        <p className="font-medium text-slate-800">
-                          Studio Apartment - Westlands
-                        </p>
-                        <p className="text-sm text-slate-500">
-                          KES 30,000/month
-                        </p>
+                      <p className="text-slate-600 mb-6">
+                        Homes you have saved for later comparison and review.
+                      </p>
+
+                      <div className="space-y-3">
+                        <div className="bg-slate-50 rounded-xl p-4">
+                          <p className="font-medium text-slate-800">
+                            2 Bedroom Apartment - Kilimani
+                          </p>
+                          <p className="text-sm text-slate-500">
+                            KES 45,000/month
+                          </p>
+                        </div>
+                        <div className="bg-slate-50 rounded-xl p-4">
+                          <p className="font-medium text-slate-800">
+                            Studio Apartment - Westlands
+                          </p>
+                          <p className="text-sm text-slate-500">
+                            KES 30,000/month
+                          </p>
+                        </div>
                       </div>
+
+                      <button className="mt-6 px-4 py-2 rounded-xl bg-sky-500 text-white hover:bg-sky-600 transition">
+                        View Saved Homes
+                      </button>
                     </div>
 
-                    <button className="mt-6 px-4 py-2 rounded-xl bg-sky-500 text-white hover:bg-sky-600 transition">
-                      View Saved Homes
-                    </button>
+                    <div className="bg-white rounded-2xl shadow-md p-6 border border-slate-200">
+                      <div className="flex items-center justify-between mb-4">
+                        <h2 className="text-xl font-semibold text-slate-800">
+                          Recently Viewed
+                        </h2>
+                        <span className="text-sm bg-amber-100 text-amber-700 px-3 py-1 rounded-full">
+                          8 Viewed
+                        </span>
+                      </div>
+                      <p className="text-slate-600 mb-6">
+                        Listings you recently checked and may want to revisit.
+                      </p>
+
+                      <div className="space-y-3">
+                        <div className="bg-slate-50 rounded-xl p-4">
+                          <p className="font-medium text-slate-800">
+                            1 Bedroom House - Syokimau
+                          </p>
+                          <p className="text-sm text-slate-500">
+                            KES 25,000/month
+                          </p>
+                        </div>
+                        <div className="bg-slate-50 rounded-xl p-4">
+                          <p className="font-medium text-slate-800">
+                            Bedsitter - South B
+                          </p>
+                          <p className="text-sm text-slate-500">
+                            KES 18,000/month
+                          </p>
+                        </div>
+                      </div>
+
+                      <button className="mt-6 px-4 py-2 rounded-xl bg-slate-800 text-white hover:bg-slate-900 transition">
+                        Open Recent Views
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+                    <div className="bg-white rounded-2xl shadow-md p-5 border border-slate-200">
+                      <h3 className="text-lg font-semibold text-slate-800 mb-3">
+                        Popular Locations
+                      </h3>
+                      <ul className="space-y-2 text-slate-600">
+                        <li>Kilimani</li>
+                        <li>Westlands</li>
+                        <li>Syokimau</li>
+                      </ul>
+                    </div>
+
+                    <div className="bg-white rounded-2xl shadow-md p-5 border border-slate-200">
+                      <h3 className="text-lg font-semibold text-slate-800 mb-3">
+                        Budget Overview
+                      </h3>
+                      <p className="text-slate-600">Min: KES 20,000</p>
+                      <p className="text-slate-600">Max: KES 60,000</p>
+                      <p className="text-slate-600">Target: 1–2 Bedroom</p>
+                    </div>
+
+                    <div className="bg-white rounded-2xl shadow-md p-5 border border-slate-200">
+                      <h3 className="text-lg font-semibold text-slate-800 mb-3">
+                        Search Activity
+                      </h3>
+                      <p className="text-3xl font-bold text-sky-600">24</p>
+                      <p className="text-slate-600 mt-2">
+                        Searches made this week
+                      </p>
+                    </div>
+
+                    <div className="bg-white rounded-2xl shadow-md p-5 border border-slate-200">
+                      <h3 className="text-lg font-semibold text-slate-800 mb-3">
+                        New Matches
+                      </h3>
+                      <p className="text-3xl font-bold text-emerald-600">6</p>
+                      <p className="text-slate-600 mt-2">
+                        New homes matching your preferences
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                </section>
+
+                <section id="history">
+                <div className="space-y-8">
+                  <div>
+                    <h1 className="text-3xl font-bold text-slate-800 mb-2">
+                      Search History
+                    </h1>
+                    <p className="text-slate-600">
+                      View the houses, locations, and filters you have searched
+                      recently.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="bg-white rounded-2xl shadow-md p-5 border border-slate-200">
+                      <h3 className="text-lg font-semibold text-slate-800">
+                        Total Searches
+                      </h3>
+                      <p className="text-3xl font-bold text-sky-600 mt-3">24</p>
+                      <p className="text-sm text-slate-500 mt-1">
+                        Searches this week
+                      </p>
+                    </div>
+
+                    <div className="bg-white rounded-2xl shadow-md p-5 border border-slate-200">
+                      <h3 className="text-lg font-semibold text-slate-800">
+                        Most Searched Area
+                      </h3>
+                      <p className="text-3xl font-bold text-emerald-600 mt-3">
+                        Kilimani
+                      </p>
+                      <p className="text-sm text-slate-500 mt-1">
+                        Based on recent activity
+                      </p>
+                    </div>
+
+                    <div className="bg-white rounded-2xl shadow-md p-5 border border-slate-200">
+                      <h3 className="text-lg font-semibold text-slate-800">
+                        Last Search
+                      </h3>
+                      <p className="text-xl font-bold text-slate-800 mt-3">
+                        2 Bedroom
+                      </p>
+                      <p className="text-sm text-slate-500 mt-1">
+                        Westlands • KES 45,000
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden">
+                    <div className="p-6 border-b border-slate-200">
+                      <h2 className="text-xl font-semibold text-slate-800">
+                        Recent Searches
+                      </h2>
+                      <p className="text-slate-600 mt-1">
+                        Your latest house-search activity.
+                      </p>
+                    </div>
+
+                    <div className="divide-y divide-slate-200">
+                      <div className="p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                        <div>
+                          <h3 className="font-semibold text-slate-800">
+                            2 Bedroom Apartment
+                          </h3>
+                          <p className="text-sm text-slate-500">
+                            Location: Kilimani • Budget: KES 35,000 - KES 55,000
+                          </p>
+                        </div>
+                        <button className="px-4 py-2 rounded-xl bg-sky-500 text-white hover:bg-sky-600 transition">
+                          Search Again
+                        </button>
+                      </div>
+
+                      <div className="p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                        <div>
+                          <h3 className="font-semibold text-slate-800">
+                            Studio Apartment
+                          </h3>
+                          <p className="text-sm text-slate-500">
+                            Location: Westlands • Budget: KES 25,000 - KES 40,000
+                          </p>
+                        </div>
+                        <button className="px-4 py-2 rounded-xl bg-sky-500 text-white hover:bg-sky-600 transition">
+                          Search Again
+                        </button>
+                      </div>
+
+                      <div className="p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                        <div>
+                          <h3 className="font-semibold text-slate-800">
+                            Bedsitter
+                          </h3>
+                          <p className="text-sm text-slate-500">
+                            Location: South B • Budget: KES 12,000 - KES 22,000
+                          </p>
+                        </div>
+                        <button className="px-4 py-2 rounded-xl bg-sky-500 text-white hover:bg-sky-600 transition">
+                          Search Again
+                        </button>
+                      </div>
+
+                      <div className="p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                        <div>
+                          <h3 className="font-semibold text-slate-800">
+                            One Bedroom House
+                          </h3>
+                          <p className="text-sm text-slate-500">
+                            Location: Syokimau • Budget: KES 20,000 - KES 35,000
+                          </p>
+                        </div>
+                        <button className="px-4 py-2 rounded-xl bg-sky-500 text-white hover:bg-sky-600 transition">
+                          Search Again
+                        </button>
+                      </div>
+                    </div>
                   </div>
 
                   <div className="bg-white rounded-2xl shadow-md p-6 border border-slate-200">
-                    <div className="flex items-center justify-between mb-4">
-                      <h2 className="text-xl font-semibold text-slate-800">
-                        Recently Viewed
-                      </h2>
-                      <span className="text-sm bg-amber-100 text-amber-700 px-3 py-1 rounded-full">
-                        8 Viewed
-                      </span>
-                    </div>
-                    <p className="text-slate-600 mb-6">
-                      Listings you recently checked and may want to revisit.
-                    </p>
+                    <h2 className="text-xl font-semibold text-slate-800 mb-4">
+                      Top Locations Searched
+                    </h2>
 
-                    <div className="space-y-3">
-                      <div className="bg-slate-50 rounded-xl p-4">
-                        <p className="font-medium text-slate-800">
-                          1 Bedroom House - Syokimau
-                        </p>
-                        <p className="text-sm text-slate-500">
-                          KES 25,000/month
-                        </p>
+                    <div className="space-y-4">
+                      <div>
+                        <div className="flex justify-between text-sm mb-1">
+                          <span className="text-slate-700">Kilimani</span>
+                          <span className="text-slate-500">9 searches</span>
+                        </div>
+                        <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
+                          <div className="h-full w-3/4 bg-sky-500 rounded-full"></div>
+                        </div>
                       </div>
-                      <div className="bg-slate-50 rounded-xl p-4">
-                        <p className="font-medium text-slate-800">
-                          Bedsitter - South B
-                        </p>
-                        <p className="text-sm text-slate-500">
-                          KES 18,000/month
-                        </p>
+
+                      <div>
+                        <div className="flex justify-between text-sm mb-1">
+                          <span className="text-slate-700">Westlands</span>
+                          <span className="text-slate-500">7 searches</span>
+                        </div>
+                        <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
+                          <div className="h-full w-2/3 bg-emerald-500 rounded-full"></div>
+                        </div>
+                      </div>
+
+                      <div>
+                        <div className="flex justify-between text-sm mb-1">
+                          <span className="text-slate-700">Syokimau</span>
+                          <span className="text-slate-500">5 searches</span>
+                        </div>
+                        <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
+                          <div className="h-full w-1/2 bg-amber-500 rounded-full"></div>
+                        </div>
                       </div>
                     </div>
-
-                    <button className="mt-6 px-4 py-2 rounded-xl bg-slate-800 text-white hover:bg-slate-900 transition">
-                      Open Recent Views
-                    </button>
                   </div>
                 </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-                  <div className="bg-white rounded-2xl shadow-md p-5 border border-slate-200">
-                    <h3 className="text-lg font-semibold text-slate-800 mb-3">
-                      Popular Locations
-                    </h3>
-                    <ul className="space-y-2 text-slate-600">
-                      <li>Kilimani</li>
-                      <li>Westlands</li>
-                      <li>Syokimau</li>
-                    </ul>
-                  </div>
-
-                  <div className="bg-white rounded-2xl shadow-md p-5 border border-slate-200">
-                    <h3 className="text-lg font-semibold text-slate-800 mb-3">
-                      Budget Overview
-                    </h3>
-                    <p className="text-slate-600">Min: KES 20,000</p>
-                    <p className="text-slate-600">Max: KES 60,000</p>
-                    <p className="text-slate-600">Target: 1–2 Bedroom</p>
-                  </div>
-
-                  <div className="bg-white rounded-2xl shadow-md p-5 border border-slate-200">
-                    <h3 className="text-lg font-semibold text-slate-800 mb-3">
-                      Search Activity
-                    </h3>
-                    <p className="text-3xl font-bold text-sky-600">24</p>
-                    <p className="text-slate-600 mt-2">
-                      Searches made this week
-                    </p>
-                  </div>
-
-                  <div className="bg-white rounded-2xl shadow-md p-5 border border-slate-200">
-                    <h3 className="text-lg font-semibold text-slate-800 mb-3">
-                      New Matches
-                    </h3>
-                    <p className="text-3xl font-bold text-emerald-600">6</p>
-                    <p className="text-slate-600 mt-2">
-                      New homes matching your preferences
-                    </p>
-                  </div>
-                </div>
+                </section>
               </div>
             )}
 
-            {activeSection === "profile" && (
-              <div className="space-y-6">
+            {activeSection === "preferences" && (
+              <div className="space-y-8">
                 <div>
                   <h1 className="text-3xl font-bold text-slate-800 mb-2">
-                    My Profile
+                    Preferences
                   </h1>
                   <p className="text-slate-600">
-                    View your personal and location details here.
+                    Set your housing preferences so Tafuta can show you listings
+                    that match your needs.
                   </p>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <div className="bg-white rounded-2xl shadow-md p-6">
-                    <div className="flex items-center gap-6 mb-6">
-                      <input
-                        type="file"
-                        ref={fileInputRef}
-                        onChange={handleProfilePhotoChange}
-                        className="hidden"
-                        accept="image/*"
-                      />
+                  <div className="bg-white rounded-2xl shadow-md p-6 border border-slate-200">
+                    <h2 className="text-xl font-semibold text-slate-800 mb-2">
+                      Budget Preference
+                    </h2>
+                    <p className="text-slate-600 mb-6">
+                      Set the minimum and maximum rent you are comfortable with.
+                    </p>
 
-                      <button
-                        type="button"
-                        onClick={() => fileInputRef.current?.click()}
-                        disabled={uploadingPhoto}
-                        className="w-24 h-24 rounded-full border-4 border-sky-500 flex items-center justify-center bg-slate-200 overflow-hidden"
-                      >
-                        {user?.profilePic ? (
-                          <img
-                            src={user.profilePic}
-                            alt="Profile"
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <User className="w-10 h-10 text-slate-500" />
-                        )}
-                      </button>
+                    <div className="space-y-4">
                       <div>
-                        <h2 className="text-2xl font-semibold text-slate-800">
-                          {user?.name}
-                        </h2>
-                        <p className="text-slate-600">
-                          {user?.role || "Not specified"}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="space-y-4 text-slate-700">
-                      <div>
-                        <p className="font-semibold">Email</p>
-                        <p>{user?.email}</p>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                          Minimum Rent
+                        </label>
+                        <input
+                          type="number"
+                          name="min_rent"
+                          value={preferencesForm.min_rent}
+                          onChange={handlePreferencesChange}
+                          placeholder="e.g. 15000"
+                          className="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none focus:ring-2 focus:ring-sky-400"
+                        />
                       </div>
 
                       <div>
-                        <p className="font-semibold">Phone</p>
-                        <p>{user?.phone || "Not specified"}</p>
-                      </div>
-
-                      <div>
-                        <p className="font-semibold">Role</p>
-                        <p>{user?.role || "Not specified"}</p>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                          Maximum Rent
+                        </label>
+                        <input
+                          type="number"
+                          name="max_rent"
+                          value={preferencesForm.max_rent}
+                          onChange={handlePreferencesChange}
+                          placeholder="e.g. 50000"
+                          className="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none focus:ring-2 focus:ring-sky-400"
+                        />
                       </div>
                     </div>
                   </div>
 
-                  <div className="bg-white rounded-2xl shadow-md p-6">
-                    <h2 className="text-2xl font-semibold text-slate-800 mb-6">
-                      Location Details
+                  <div className="bg-white rounded-2xl shadow-md p-6 border border-slate-200">
+                    <h2 className="text-xl font-semibold text-slate-800 mb-2">
+                      Preferred Locations
                     </h2>
+                    <p className="text-slate-600 mb-6">
+                      Add up to three locations where you would like to find a
+                      home.
+                    </p>
 
-                    <div className="space-y-4 text-slate-700">
-                      <div>
-                        <p className="font-semibold">City</p>
-                        <p>{user?.city || "Not specified"}</p>
-                      </div>
+                    <div className="space-y-4">
+                      <input
+                        type="text"
+                        name="preferred_loc_1"
+                        value={preferencesForm.preferred_loc_1}
+                        onChange={handlePreferencesChange}
+                        placeholder="First choice location"
+                        className="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none focus:ring-2 focus:ring-sky-400"
+                      />
 
-                      <div>
-                        <p className="font-semibold">Constituency</p>
-                        <p>{user?.constituency || "Not specified"}</p>
-                      </div>
+                      <input
+                        type="text"
+                        name="preferred_loc_2"
+                        value={preferencesForm.preferred_loc_2}
+                        onChange={handlePreferencesChange}
+                        placeholder="Second choice location"
+                        className="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none focus:ring-2 focus:ring-sky-400"
+                      />
 
-                      <div>
-                        <p className="font-semibold">Area</p>
-                        <p>{user?.area || "Not specified"}</p>
-                      </div>
-
-                      <div>
-                        <p className="font-semibold">Full Location</p>
-                        <p>
-                          {user?.city && user?.constituency && user?.area
-                            ? `${user.city}, ${user.constituency}, ${user.area}`
-                            : "Not specified"}
-                        </p>
-                      </div>
+                      <input
+                        type="text"
+                        name="preferred_loc_3"
+                        value={preferencesForm.preferred_loc_3}
+                        onChange={handlePreferencesChange}
+                        placeholder="Third choice location"
+                        className="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none focus:ring-2 focus:ring-sky-400"
+                      />
                     </div>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-2xl shadow-md p-6 border border-slate-200">
+                  <h2 className="text-xl font-semibold text-slate-800 mb-2">
+                    Housing Type
+                  </h2>
+                  <p className="text-slate-600 mb-6">
+                    Select the type of housing you are interested in.
+                  </p>
+
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {housingOptions.map((option) => (
+                      <button
+                        key={option.id}
+                        type="button"
+                        onClick={() => handleHousingTypeSelect(option.id)}
+                        className={`px-4 py-3 rounded-xl border transition text-slate-700 ${
+                          Number(preferencesForm.housing_id) ===
+                          Number(option.id)
+                            ? "bg-sky-500 text-white border-sky-500"
+                            : "border-slate-300 hover:bg-sky-50 hover:border-sky-400"
+                        }`}
+                      >
+                        {option.name}
+                      </button>
+                    ))}
+                  </div>
+
+                  {housingOptions.length === 0 && (
+                    <p className="mt-4 text-sm text-red-500">
+                      No housing options found. Add records in the
+                      housing_options table.
+                    </p>
+                  )}
+
+                  <div className="mt-8 flex justify-end">
+                    <button
+                      type="button"
+                      onClick={savePreferences}
+                      disabled={savingPreferences}
+                      className="px-6 py-3 rounded-xl bg-sky-500 text-white hover:bg-sky-600 transition disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                      {savingPreferences ? "Saving..." : "Save Preferences"}
+                    </button>
                   </div>
                 </div>
               </div>
@@ -1090,302 +1383,6 @@ function Dashboard() {
                         Save Display Settings
                       </button>
                     </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {activeSection === "history" && (
-              <div className="space-y-8">
-                <div>
-                  <h1 className="text-3xl font-bold text-slate-800 mb-2">
-                    Search History
-                  </h1>
-                  <p className="text-slate-600">
-                    View the houses, locations, and filters you have searched
-                    recently.
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="bg-white rounded-2xl shadow-md p-5 border border-slate-200">
-                    <h3 className="text-lg font-semibold text-slate-800">
-                      Total Searches
-                    </h3>
-                    <p className="text-3xl font-bold text-sky-600 mt-3">24</p>
-                    <p className="text-sm text-slate-500 mt-1">
-                      Searches this week
-                    </p>
-                  </div>
-
-                  <div className="bg-white rounded-2xl shadow-md p-5 border border-slate-200">
-                    <h3 className="text-lg font-semibold text-slate-800">
-                      Most Searched Area
-                    </h3>
-                    <p className="text-3xl font-bold text-emerald-600 mt-3">
-                      Kilimani
-                    </p>
-                    <p className="text-sm text-slate-500 mt-1">
-                      Based on recent activity
-                    </p>
-                  </div>
-
-                  <div className="bg-white rounded-2xl shadow-md p-5 border border-slate-200">
-                    <h3 className="text-lg font-semibold text-slate-800">
-                      Last Search
-                    </h3>
-                    <p className="text-xl font-bold text-slate-800 mt-3">
-                      2 Bedroom
-                    </p>
-                    <p className="text-sm text-slate-500 mt-1">
-                      Westlands • KES 45,000
-                    </p>
-                  </div>
-                </div>
-
-                <div className="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden">
-                  <div className="p-6 border-b border-slate-200">
-                    <h2 className="text-xl font-semibold text-slate-800">
-                      Recent Searches
-                    </h2>
-                    <p className="text-slate-600 mt-1">
-                      Your latest house-search activity.
-                    </p>
-                  </div>
-
-                  <div className="divide-y divide-slate-200">
-                    <div className="p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                      <div>
-                        <h3 className="font-semibold text-slate-800">
-                          2 Bedroom Apartment
-                        </h3>
-                        <p className="text-sm text-slate-500">
-                          Location: Kilimani • Budget: KES 35,000 - KES 55,000
-                        </p>
-                      </div>
-                      <button className="px-4 py-2 rounded-xl bg-sky-500 text-white hover:bg-sky-600 transition">
-                        Search Again
-                      </button>
-                    </div>
-
-                    <div className="p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                      <div>
-                        <h3 className="font-semibold text-slate-800">
-                          Studio Apartment
-                        </h3>
-                        <p className="text-sm text-slate-500">
-                          Location: Westlands • Budget: KES 25,000 - KES 40,000
-                        </p>
-                      </div>
-                      <button className="px-4 py-2 rounded-xl bg-sky-500 text-white hover:bg-sky-600 transition">
-                        Search Again
-                      </button>
-                    </div>
-
-                    <div className="p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                      <div>
-                        <h3 className="font-semibold text-slate-800">
-                          Bedsitter
-                        </h3>
-                        <p className="text-sm text-slate-500">
-                          Location: South B • Budget: KES 12,000 - KES 22,000
-                        </p>
-                      </div>
-                      <button className="px-4 py-2 rounded-xl bg-sky-500 text-white hover:bg-sky-600 transition">
-                        Search Again
-                      </button>
-                    </div>
-
-                    <div className="p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                      <div>
-                        <h3 className="font-semibold text-slate-800">
-                          One Bedroom House
-                        </h3>
-                        <p className="text-sm text-slate-500">
-                          Location: Syokimau • Budget: KES 20,000 - KES 35,000
-                        </p>
-                      </div>
-                      <button className="px-4 py-2 rounded-xl bg-sky-500 text-white hover:bg-sky-600 transition">
-                        Search Again
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-white rounded-2xl shadow-md p-6 border border-slate-200">
-                  <h2 className="text-xl font-semibold text-slate-800 mb-4">
-                    Top Locations Searched
-                  </h2>
-
-                  <div className="space-y-4">
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span className="text-slate-700">Kilimani</span>
-                        <span className="text-slate-500">9 searches</span>
-                      </div>
-                      <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
-                        <div className="h-full w-3/4 bg-sky-500 rounded-full"></div>
-                      </div>
-                    </div>
-
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span className="text-slate-700">Westlands</span>
-                        <span className="text-slate-500">7 searches</span>
-                      </div>
-                      <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
-                        <div className="h-full w-2/3 bg-emerald-500 rounded-full"></div>
-                      </div>
-                    </div>
-
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span className="text-slate-700">Syokimau</span>
-                        <span className="text-slate-500">5 searches</span>
-                      </div>
-                      <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
-                        <div className="h-full w-1/2 bg-amber-500 rounded-full"></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {activeSection === "preferences" && (
-              <div className="space-y-8">
-                <div>
-                  <h1 className="text-3xl font-bold text-slate-800 mb-2">
-                    Preferences
-                  </h1>
-                  <p className="text-slate-600">
-                    Set your housing preferences so Tafuta can show you listings
-                    that match your needs.
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <div className="bg-white rounded-2xl shadow-md p-6 border border-slate-200">
-                    <h2 className="text-xl font-semibold text-slate-800 mb-2">
-                      Budget Preference
-                    </h2>
-                    <p className="text-slate-600 mb-6">
-                      Set the minimum and maximum rent you are comfortable with.
-                    </p>
-
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
-                          Minimum Rent
-                        </label>
-                        <input
-                          type="number"
-                          name="min_rent"
-                          value={preferencesForm.min_rent}
-                          onChange={handlePreferencesChange}
-                          placeholder="e.g. 15000"
-                          className="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none focus:ring-2 focus:ring-sky-400"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
-                          Maximum Rent
-                        </label>
-                        <input
-                          type="number"
-                          name="max_rent"
-                          value={preferencesForm.max_rent}
-                          onChange={handlePreferencesChange}
-                          placeholder="e.g. 50000"
-                          className="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none focus:ring-2 focus:ring-sky-400"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-white rounded-2xl shadow-md p-6 border border-slate-200">
-                    <h2 className="text-xl font-semibold text-slate-800 mb-2">
-                      Preferred Locations
-                    </h2>
-                    <p className="text-slate-600 mb-6">
-                      Add up to three locations where you would like to find a
-                      home.
-                    </p>
-
-                    <div className="space-y-4">
-                      <input
-                        type="text"
-                        name="preferred_loc_1"
-                        value={preferencesForm.preferred_loc_1}
-                        onChange={handlePreferencesChange}
-                        placeholder="First choice location"
-                        className="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none focus:ring-2 focus:ring-sky-400"
-                      />
-
-                      <input
-                        type="text"
-                        name="preferred_loc_2"
-                        value={preferencesForm.preferred_loc_2}
-                        onChange={handlePreferencesChange}
-                        placeholder="Second choice location"
-                        className="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none focus:ring-2 focus:ring-sky-400"
-                      />
-
-                      <input
-                        type="text"
-                        name="preferred_loc_3"
-                        value={preferencesForm.preferred_loc_3}
-                        onChange={handlePreferencesChange}
-                        placeholder="Third choice location"
-                        className="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none focus:ring-2 focus:ring-sky-400"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-white rounded-2xl shadow-md p-6 border border-slate-200">
-                  <h2 className="text-xl font-semibold text-slate-800 mb-2">
-                    Housing Type
-                  </h2>
-                  <p className="text-slate-600 mb-6">
-                    Select the type of housing you are interested in.
-                  </p>
-
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {housingOptions.map((option) => (
-                      <button
-                        key={option.id}
-                        type="button"
-                        onClick={() => handleHousingTypeSelect(option.id)}
-                        className={`px-4 py-3 rounded-xl border transition text-slate-700 ${
-                          Number(preferencesForm.housing_id) ===
-                          Number(option.id)
-                            ? "bg-sky-500 text-white border-sky-500"
-                            : "border-slate-300 hover:bg-sky-50 hover:border-sky-400"
-                        }`}
-                      >
-                        {option.name}
-                      </button>
-                    ))}
-                  </div>
-
-                  {housingOptions.length === 0 && (
-                    <p className="mt-4 text-sm text-red-500">
-                      No housing options found. Add records in the
-                      housing_options table.
-                    </p>
-                  )}
-
-                  <div className="mt-8 flex justify-end">
-                    <button
-                      type="button"
-                      onClick={savePreferences}
-                      disabled={savingPreferences}
-                      className="px-6 py-3 rounded-xl bg-sky-500 text-white hover:bg-sky-600 transition disabled:opacity-60 disabled:cursor-not-allowed"
-                    >
-                      {savingPreferences ? "Saving..." : "Save Preferences"}
-                    </button>
                   </div>
                 </div>
               </div>
