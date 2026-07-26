@@ -118,3 +118,13 @@ def delete_housing_listing(listing_id: int):
         "message": "Housing listing deleted successfully",
         "deleted": response.data
     }
+
+@app.get("/api/v1/me")
+def get_current_user():
+    return {
+        "id": "8797f47d-...",
+        "full_name": "Ian Muhavi",
+        "email": "ian@example.com",
+        "city": "Eldoret",
+  "area": "Pioneer"
+}

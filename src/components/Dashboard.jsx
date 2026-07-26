@@ -730,7 +730,7 @@ function Dashboard() {
                       Dashboard
                     </h1>
                     <p className="text-slate-600">
-                      Welcome back, {user?.name}. Here is a quick overview of your
+                       Here is a quick overview of your
                       housing activity.
                     </p>
                   </div>
